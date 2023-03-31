@@ -23,7 +23,7 @@ size_t fill_data(std::string str,std::string dest,size_t n , std::string &data)
 size_t pars::server_name(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"server_name",n,str);
-    std::cout<< str << std::endl;
+    std::cout<< "1 ----- >" << str << std::endl;
     return(n);
 }
 size_t pars::listen(std::string &src,size_t n,std::string &str)

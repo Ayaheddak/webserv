@@ -13,5 +13,5 @@ int main(int argc,char **argv)
 {
     check_arguments(argc,argv);
     pars parsing(argv[1]);
-
+   
 }
