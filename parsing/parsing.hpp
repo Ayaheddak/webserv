@@ -5,6 +5,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
+#include <sys/socket.h>
+#include<netinet/in.h>     
+#include <unistd.h>
 
 class loc
 {
@@ -22,7 +26,7 @@ class data
 {
     public:
         std::string server_name;//hostname
-        std::string listen;//port
+        std::string port;//port
         std::vector<std::string> error_page;
         std::string body_size;
         std::string root;
@@ -32,11 +36,10 @@ class data
 };
 class pars
 {
-    private:
+    public:
         std::ifstream inputfile;
         std::string f_data;
-        std::vector<data> s_data; 
-    public:
+        std::vector<data> s_data;
         pars(char *str);
         void check_data();
         size_t location(size_t n,data &server);

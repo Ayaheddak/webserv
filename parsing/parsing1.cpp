@@ -77,12 +77,12 @@ size_t pars::which_one(size_t n,data &server)
     }
     else if(f_data.find("listen",n) == n)
     {
-        if(server.listen.length() > 0)
+        if(server.port.length() > 0)
         {
             std::cerr << "error already filled" << std::endl;
             exit(1);
         } 
-        return(listen(f_data,n,server.listen));
+        return(listen(f_data,n,server.port));
     }
      else if(f_data.find("root",n) == n)
     {
