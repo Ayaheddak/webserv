@@ -1,14 +1,6 @@
 #ifndef PARSING_HPP
 #define PARSING_HPP
-
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cstdlib>
-#include <sys/socket.h>
-#include<netinet/in.h>     
-#include <unistd.h>
+#include"Utils.hpp"
 
 class loc
 {

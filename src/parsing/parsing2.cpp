@@ -1,21 +1,21 @@
-#include "parsing.hpp"
+#include"../../includes/parsing.hpp"
 
 size_t pars::s_return(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"return",n,str);
-    std::cout<< str << std::endl;
+    // std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::alias(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"alias",n,str);
-    std::cout<< str << std::endl;
+    // std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::autoindex(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"autoindex",n,str);
-    std::cout<< str << std::endl;
+    // std::cout<< str << std::endl;
     return(n);
 }
 size_t fill_l_data(std::string str,std::string dest,size_t n , std::string &data)
