@@ -1,4 +1,4 @@
-#include"../../includes/parsing.hpp"
+#include "../../includes/parsing.hpp"
 
 size_t whitespaces(std::string str,size_t n)
 {
@@ -23,31 +23,31 @@ size_t fill_data(std::string str,std::string dest,size_t n , std::string &data)
 size_t pars::server_name(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"server_name",n,str);
-    // std::cout<< "1 ----- >" << str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::listen(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"listen",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::root(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"root",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::index(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"index",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::body_size(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"bodysize",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::error_page(std::string &src,size_t n,data &server)
@@ -55,13 +55,14 @@ size_t pars::error_page(std::string &src,size_t n,data &server)
     std::string str;
     n = fill_data(src,"error_page",n,str);
     server.error_page.push_back(str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
+
 size_t pars::allow_methods(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"allow_methods",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::which_one(size_t n,data &server)
@@ -77,12 +78,12 @@ size_t pars::which_one(size_t n,data &server)
     }
     else if(f_data.find("listen",n) == n)
     {
-        if(server.port.length() > 0)
+        if(server.listen.length() > 0)
         {
             std::cerr << "error already filled" << std::endl;
             exit(1);
         } 
-        return(listen(f_data,n,server.port));
+        return(listen(f_data,n,server.listen));
     }
      else if(f_data.find("root",n) == n)
     {
@@ -108,7 +109,7 @@ size_t pars::which_one(size_t n,data &server)
         {
             std::cerr << "error already filled" << std::endl;
             exit(1);
-        } 
+        }
         return(allow_methods(f_data,n,server.allow_methods));   
     }
     else if(f_data.find("location",n) == n)

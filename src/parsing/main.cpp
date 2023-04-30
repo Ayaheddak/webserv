@@ -1,5 +1,10 @@
 #include <iostream>
-#include"../../includes/parsing.hpp"
+#include "../../includes/parsing.hpp"
+#include <iostream>
+#include <string>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
 void check_arguments(int argc,char **argv)
 {
     if(argc > 2)
@@ -17,25 +22,35 @@ int main(int argc,char **argv)
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons(std::atoi(parsing.s_data[0].port.c_str()));
+    addr.sin_port = htons(8888);
     bind(sock, (struct sockaddr *)&addr, sizeof(addr));
     listen(sock, 1);
+    std::vector<loc>::iterator it;
     while(true)
     {
-    int client_sock = accept(sock, NULL, NULL);
+        
+        int client_sock = accept(sock, NULL, NULL);
 
-    char buf[4096];
-    ssize_t nread = recv(client_sock, buf, sizeof(buf), 0);
-    if (nread < 0) {
-        std::cerr << "Error reading from client" << std::endl;
-    } else {
-        std::string request(buf, nread);
-        std::cout << "Received request: " << request << std::endl;
+        char buf[4096];
+        ssize_t nread = recv(client_sock, buf, sizeof(buf), 0);
+        if (nread < 0) {
+            std::cerr << "Error reading from client" << std::endl;
+        } else {
+            std::string request(buf, nread);
+            std::cout << request << std::endl;
+            parsing.fill_request(request);
+            parsing.respons(client_sock);
+        }
+        close(client_sock);
     }
-    }
-    close(sock);
-
     return 0;
 
-   
 }
+       if (nread < 0) {
+            std::cerr << "Error reading from client" << std::endl;
+        } else {
+            std::string request(buf, nread);
+            std::cout << request << std::endl;
+            parsing.fill_request(request);
+            parsing.respons(client_sock);
+        }

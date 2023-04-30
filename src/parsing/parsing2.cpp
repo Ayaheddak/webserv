@@ -1,21 +1,21 @@
-#include"../../includes/parsing.hpp"
+#include "../../includes/parsing.hpp"
 
 size_t pars::s_return(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"return",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::alias(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"alias",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t pars::autoindex(std::string &src,size_t n,std::string &str)
 {
     n = fill_data(src,"autoindex",n,str);
-    // std::cout<< str << std::endl;
+    std::cout<< str << std::endl;
     return(n);
 }
 size_t fill_l_data(std::string str,std::string dest,size_t n , std::string &data)
@@ -33,29 +33,29 @@ size_t fill_l_data(std::string str,std::string dest,size_t n , std::string &data
         exit(1);
     return(str.find('}',n) + 1);
 }
-size_t pars::which_one1(size_t n,std::string data,loc location)
+size_t pars::which_one1(size_t n,std::string data,loc &location)
 {
-    if(data.find("root") == n)
+    if(data.find("root",n) == n)
     {
         return(root(data,n,location.root));
     }
-     else if(data.find("index") == n)
+     else if(data.find("index",n) == n)
     {
-        return(index(data,n,location.index));   
+        return(index(data,n,location.index)); 
     }
-    else if(data.find("allow_methods") == n)
+    else if(data.find("allow_methods",n) == n)
     {
         return(allow_methods(data,n,location.allow_methods));   
     }
-    else if(data.find("return") == n)
+    else if(data.find("return",n) == n)
     {
         return(s_return(data,n,location.s_return));   
     }
-    else if (data.find("alias") == n)
+    else if (data.find("alias",n) == n)
     {
         return(alias(data,n,location.alias));   
     }
-    else if (data.find("autoindex") == n)
+    else if (data.find("autoindex",n) == n)
     {
         return(autoindex(data,n,location.autoindex));   
     }
@@ -76,7 +76,7 @@ size_t pars::location(size_t n,data &server)
         exit(1);
     while(location[i] != ' ' && location[i] != '\t')
         i++;
-    s_location.path = location.substr(location.find('/'),i - 1);
+    s_location.path = location.substr(location.find('/'),i);
     if(location[i] != ' ' && location[i] != '\t')
         exit(1);
     i = whitespaces(location,i);
