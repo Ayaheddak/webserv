@@ -8,6 +8,8 @@
 #include <sstream>          
 #include <cstring>
 #include <algorithm>
+#include <signal.h>
+
 #include <cstdlib>
 #include <netinet/in.h>
 

@@ -150,7 +150,7 @@ void    Server::start(pars &parsing)
 					std::string request(buff, rec);
             		std::cout << request << std::endl;
             		parsing.fill_request(request);
-            		parsing.respons(client_sock);
+            		parsing.respons(it->getClientFd());
 				}
 
 			}
