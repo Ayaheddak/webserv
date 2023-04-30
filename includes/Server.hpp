@@ -19,7 +19,7 @@ class Server
         std::pair <std::pair<std::string, std::string>, int> create(std::pair <std::string , std::string > infos);
         bool isListener(int fd);
         void Form();
-        void start();
+        void start(pars &parsing);
         /*
             =============================== exceptions ===================================== 
         */

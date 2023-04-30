@@ -1,12 +1,25 @@
 #include "../../includes/Server.hpp"
-int main() 
+#include "../../includes/parsing.hpp"
+void check_arguments(int argc,char **argv)
+{
+    if(argc > 2)
+    {
+        std::cerr<<"Too many arguments" << std::endl;
+        exit(1);
+    }
+    (void)argv;
+}
+int main(int argc,char **argv) 
 {
     std::list<std::pair<std::string, std::string> > _port;
-    _port.push_back(std::make_pair("8086", "127.0.0.1"));
-    _port.push_back(std::make_pair("8082", "127.0.0.1"));
-    _port.push_back(std::make_pair("8083", "127.0.0.1"));
-    _port.push_back(std::make_pair("8084", "127.0.0.1"));
+    check_arguments(argc,argv);
+    pars parsing(argv[1]);
+    std::vector<data>::iterator it;
+    for (it = parsing.s_data.begin(); it != parsing.s_data.end(); it++)
+    {
+        _port.push_back(std::make_pair(it->listen, "127.0.0.1"));
+    }
     Server server(_port);
-    server.start();
+    server.start(parsing);
     return 0;
 }

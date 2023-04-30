@@ -1,5 +1,5 @@
 #include "../../includes/Server.hpp"
-
+#include "../../includes/parsing.hpp"
 Server::Server()
 {}
 
@@ -54,7 +54,7 @@ bool Server::isListener(int fd)
     return (FALSE);
 }
 
-void    Server::start()
+void    Server::start(pars &parsing)
 {
 	int                 maxFds;  
 	fd_set              writeFds;
@@ -145,8 +145,12 @@ void    Server::start()
 				}
 				else
 				{
-					std::cout << "rec --> "<< rec << std::endl;
-					std::cout << "buffer --> "<< buff << std::endl;
+					//std::cout << "rec --> "<< rec << std::endl;
+					//std::cout << "buffer --> "<< buff << std::endl;
+					std::string request(buff, rec);
+            		std::cout << request << std::endl;
+            		parsing.fill_request(request);
+            		parsing.respons(client_sock);
 				}
 
 			}
