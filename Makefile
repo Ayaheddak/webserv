@@ -1,19 +1,25 @@
-CC = c++ 
+NAME	=	webserv
 
-SRC =  src/parsing/parsing.cpp src/parsing/error_codes.cpp src/parsing/parsing1.cpp src/parsing/send.cpp src/parsing/parsing2.cpp src/parsing/parsing_request.cpp\
+UTILS	=	 src/parsing/parsing.cpp src/parsing/error_codes.cpp src/parsing/parsing1.cpp src/parsing/send.cpp src/parsing/parsing2.cpp src/parsing/parsing_request.cpp\
 		src/networking/Client.cpp src/networking/main.cpp src/networking/Server.cpp
 
-NAME = webserv
+FLAGS	=	-Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
-all: $(NAME)
+RM		=	rm -f
 
-$(NAME): $(SRC)
-	$(CC) $(SRC) -o $(NAME)
+CC		=	c++
 
-clean:
-	rm -f $(NAME) 
+OBJS 	= ${UTILS:.cpp=.o}
 
-fclean: clean	
-	rm -f $(NAME) 
+all		:	$(NAME)
+
+$(NAME)	:	$(UTILS)	
+	@$(CC) $(FLAGS) $(UTILS) -o $(NAME)
+
+clean :
+	@${RM} $(OBJCT)
+
+fclean :	clean
+	@${RM} ${NAME}
 
 re : fclean all

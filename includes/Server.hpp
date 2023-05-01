@@ -18,6 +18,8 @@ class Server
 		int createSocket(std::string port, std::string ip);
         std::pair <std::pair<std::string, std::string>, int> create(std::pair <std::string , std::string > infos);
         bool isListener(int fd);
+		bool isClient(int fd);
+		std::list<Client>::iterator	getClient(int fd);
         void Form();
         void start(pars &parsing);
         /*
@@ -39,5 +41,11 @@ class Server
                 public :
                     const char * what () const throw ();
             };
+			struct SelectException : public std::exception
+            {
+                public :
+                    const char * what () const throw ();
+            };
 };
+
 #endif

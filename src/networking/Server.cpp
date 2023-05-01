@@ -54,6 +54,30 @@ bool Server::isListener(int fd)
 	return (FALSE);
 }
 
+bool Server::isClient(int fd)
+{
+    for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
+    {
+        if (it->getClientFd() == fd)
+        {
+            _clients.erase(it);
+            return (TRUE);
+        }
+    }
+    return (FALSE);
+}
+
+std::list<Client>::iterator	Server::getClient(int fd)
+{
+    std::list<Client>::iterator it;
+    for (it = _clients.begin(); it != _clients.end(); ++it)
+	{
+        if (it->getClientFd() == fd) 
+            return it;
+    }
+    return std::list<Client>::iterator();
+}
+
 void Server::start(pars &parsing)
 {
 	int maxFds;
@@ -62,7 +86,6 @@ void Server::start(pars &parsing)
 	fd_set backupRead;
 	fd_set backupWrite;
 	struct timeval timeout;
-	// char buff[30000] = {0};
 
 	signal(SIGPIPE, SIG_IGN);
 	FD_ZERO(&backupRead);
@@ -71,35 +94,31 @@ void Server::start(pars &parsing)
 	FD_ZERO(&writeFds);
 	for (std::list<std::pair<std::string, std::string> >::iterator it = _infoconfig.begin(); it != _infoconfig.end(); it++)
 		_listners.push_back(create(*it));
-	// maxFds = _listners.size();
 	maxFds = std::numeric_limits<int>::min(); 
 	for (std::list<std::pair<std::pair<std::string, std::string>, int> >::iterator it = _listners.begin(); it != _listners.end(); it++)
 		{
 			FD_SET(it->second, &backupRead);
 			if (it->second > maxFds)
-				maxFds = it->second; // Update the maximum value
+				maxFds = it->second;
 		}
 	while (true)
 	{
 		std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
 
-		timeout.tv_sec = 1;
+		timeout.tv_sec = 5;
 		timeout.tv_usec = 0;
 		FD_ZERO(&readFds);
 		FD_ZERO(&writeFds);
 
 		readFds = backupRead; // cuz select is destructive
 		writeFds = backupWrite;
-		if (select(maxFds + 1, &readFds, &writeFds, NULL, NULL) < 0)
-		{
-			std::cout << "Error in select line 97 " << std::endl;
-			// exit(0);
-		}
+		if (select(maxFds + 1, &readFds, &writeFds, NULL, &timeout) < 0)
+			throw SelectException();
 		for (int i = 0; i <= maxFds; i++)
 		{
 			if (FD_ISSET(i, &readFds) || FD_ISSET(i, &writeFds))
 			{
-				if (isListener(i)) // if i is between servers fds accept new connection
+				if (isListener(i))
 				{
 					struct sockaddr_storage addr;
 					int clientSocket;
@@ -110,43 +129,49 @@ void Server::start(pars &parsing)
 					if (clientSocket == -1)
 					{
 						std::cout << "accept failed  " << std::endl;
-						continue;
+						continue ;
 					}
-					std::cout << "accept okey ^^  and new socket -> " << clientSocket << std::endl;
-					// Add the new client socket to the file descriptor set for select()
 					fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the new socket to non-blocking mode
-					// FD_SET(clientSocket, &backupRead);
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					Client client(clientSocket);
+					Client client(clientSocket);//, NULL, 0);
+					// std::cout << "sg here " << std::endl;
+					// std::cout << "clientsocket " << client.getClientFd() << std::endl;
+					// std::cout <<"buffer size "<<client.getBufferSize();
+					// std::cout <<"buffer "<<client.getBuffer();
 					_clients.push_back(client);
+
 					break;
 				}
 				else if (FD_ISSET(i, &readFds))
 				{
 					char buff[1025] = {0};
 					int rec = read(i, buff, 1024);
-					// std::cout << "rec --> "<< rec << std::endl;
-					// std::cout << "buffer --> "<< buff << std::endl;
+					// for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
+        			// 	if (it->getClientFd() == i)
+					// 	{
+					// 		std::cout << "aywaaa fd --> " << i << std::endl;
+					// 		std::cout << "getBuffer() -> " << it->getBuffer() << std::endl;
+					// 		std::cout << "BufferSize() -> " << it->getBufferSize() << std::endl;
+					// 	}
+					// std::cout << "getBuffer() -> " << getClient(i)->getBuffer() << std::endl;
+					// std::cout << "BufferSize() -> " << getClient(i)->getBufferSize() << std::endl;
+					// char buff[4096];
+        			// ssize_t  = recv(i, buff, sizeof(i), 0);
 					if (rec <= 0)
 					{
-						//std::cout << "connection closed " << std::endl;
 						FD_CLR(i, &backupRead);
 						if (rec == 0)
 						{
 							FD_SET(i, &backupWrite);
 							continue;
 						}
-						close(i);
+						isClient(i) && close(i);
 						break;
-						// _clients.erase();
 					}
 					else
 					{
-						// std::cout << "rec --> "<< rec << std::endl;
-						// std::cout << "buffer --> "<< buff << std::endl;
-						
 						std::string request(buff, rec);
 						std::cout << request << std::endl;
 						parsing.fill_request(request);
@@ -156,33 +181,17 @@ void Server::start(pars &parsing)
 				}
 				else if (FD_ISSET(i, &writeFds))
 				{
-					// std::cout << "write" << std::endl;
-					// 
 					char *buff; // generated response string
 					int contentLenght = 1000; // calculated content leght 
 					int ret = write(i, buff,  contentLenght);
-					if (ret <= 0){
+					if (ret <= 0)
+					{
 						FD_CLR(i, &backupWrite);
-						close(i);
-						//client remove from list;
+						isClient(i) && close(i);
 					}
 				}
 			}
 		}
-		// for (std::list<Client>::iterator it = _clients.begin() ; it != _clients.end(); it++)
-		// {
-		// 	std::cout << "client --> " << it->getClientFd() << std::endl;
-		// }
-		// for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
-		// {
-		// 	if (FD_ISSET(it->getClientFd(), &backupRead))
-		// 	{
-		// 	}
-		// 	// else if (FD_ISSET(it->getClientFd(), &backupWrite))
-		// 	// {
-		// 	// 	std::cout << "hello"<< std::endl;
-		// 	// }
-		// }
 	}
 	std::cout << "------------------Hello message sent-------------------" << std::endl;
 }
@@ -202,6 +211,10 @@ const char *Server::BindException::what() const throw()
 const char *Server::ListenException::what() const throw()
 {
 	return ("Error listening for incoming connections");
+}
+const char *Server::SelectException::what() const throw()
+{
+	return ("Error Server Couldn't select connection");
 }
 /*
  ================================================================================================

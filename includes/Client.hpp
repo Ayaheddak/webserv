@@ -3,16 +3,18 @@
 #include "Utils.hpp"
 class Client
 {
-    private:
+    private :
 		int					_clientFd;
-		// std::pair<std::string , std::string> _info;
-		// struct sockaddr_in	_clientAddress;
-	public:
-		// Client(int client, std::pair<std::string , std::string> info);
-		Client(int client);//, std::pair<std::string , std::string> info);
+		int					_bufferSize;
+		char 				_buffer[1024];
+	public :
+		Client(int client);
+		// Client(int client , char *buffer, int bufferSize);
+		void	setBuffer(char *buffer);
+		void	setBufferSize(int bufferSize);
+		int		getClientFd(void)const;
+		char	*getBuffer(void)const;
+		int		getBufferSize(void)const;
 		~Client();
-		// struct sockaddr_in	&getClientAddress ();
-		int					&getClientFd ();
-
 };
 #endif
