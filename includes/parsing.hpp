@@ -24,7 +24,9 @@ class loc
     std::string root;
     std::string index;
 };
-class data{
+
+class data
+{
     public:
     std::string server_name;
     std::string listen;
@@ -43,7 +45,8 @@ class request{
     char *response_buf;
     std::string url;
 };
-class pars{
+class pars
+{
     public:
     int sockfd;
     std::ifstream inputfile;
@@ -51,7 +54,6 @@ class pars{
     std::vector<data> s_data; 
     request r_data;
     int count;
-
     pars(char *str);
     void check_data();
     size_t location(size_t n,data &server);
