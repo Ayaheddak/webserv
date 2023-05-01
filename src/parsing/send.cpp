@@ -12,6 +12,7 @@ void pars::respons_200(std::string index)
     {
         response_body += line + "\n";
     }
+    std::cout << index.c_str() << std::endl;
     response << "HTTP/1.1 200 OK\r\n";
     response << "Content-Type: text/html; charset=UTF-8\r\n";
     response << "Content-Length: " << response_body.length() << "\r\n";
@@ -114,7 +115,6 @@ void pars::respons(int client_sock)
 {
     if(r_data.url == s_data[0].location[0].path && !s_data[0].location[0].s_return.empty())
     {
-        std::cout << "hhh" << std::endl;
         respons_301();
     }
     if(count == 0)
