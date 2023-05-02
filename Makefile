@@ -1,7 +1,7 @@
 NAME	=	webserv
 
 UTILS	=	 src/parsing/parsing.cpp src/parsing/error_codes.cpp src/parsing/parsing1.cpp src/parsing/send.cpp src/parsing/parsing2.cpp src/parsing/parsing_request.cpp\
-		src/networking/Client.cpp src/networking/main.cpp src/networking/Server.cpp
+		src/request/Client.cpp src/networking/main.cpp src/networking/Server.cpp
 
 FLAGS	=	-Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 

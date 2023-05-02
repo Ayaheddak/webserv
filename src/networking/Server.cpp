@@ -54,28 +54,33 @@ bool Server::isListener(int fd)
 	return (FALSE);
 }
 
-bool Server::isClient(int fd)
-{
-    for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
-    {
-        if (it->getClientFd() == fd)
-        {
-            _clients.erase(it);
-            return (TRUE);
-        }
-    }
-    return (FALSE);
-}
+// bool Server::isClient(int fd)
+// {
+//     for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
+//     {
+//         if (it->getClientFd() == fd)
+//         {
+//             _clients.erase(it);
+//             return (TRUE);
+//         }
+//     }
+//     return (FALSE);
+// }
 
-std::list<Client>::iterator	Server::getClient(int fd)
+// std::list<Client>::iterator	Server::getClient(int fd)
+// {
+//     std::list<Client>::iterator it;
+//     for (it = _clients.begin(); it != _clients.end(); ++it)
+// 	{
+//         if (it->getClientFd() == fd) 
+//             return it;
+//     }
+//     return std::list<Client>::iterator();
+//
+void Server::removeClient(int i, std::map<int, std::string> &client)
 {
-    std::list<Client>::iterator it;
-    for (it = _clients.begin(); it != _clients.end(); ++it)
-	{
-        if (it->getClientFd() == fd) 
-            return it;
-    }
-    return std::list<Client>::iterator();
+	client.erase(i);
+	close (i);
 }
 
 void Server::start(pars &parsing)
@@ -135,30 +140,13 @@ void Server::start(pars &parsing)
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					Client client(clientSocket);//, NULL, 0);
-					// std::cout << "sg here " << std::endl;
-					// std::cout << "clientsocket " << client.getClientFd() << std::endl;
-					// std::cout <<"buffer size "<<client.getBufferSize();
-					// std::cout <<"buffer "<<client.getBuffer();
-					_clients.push_back(client);
-
+					_clients.insert(std::make_pair(clientSocket, "")); 
 					break;
 				}
 				else if (FD_ISSET(i, &readFds))
 				{
-					char buff[1025] = {0};
-					int rec = read(i, buff, 1024);
-					// for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
-        			// 	if (it->getClientFd() == i)
-					// 	{
-					// 		std::cout << "aywaaa fd --> " << i << std::endl;
-					// 		std::cout << "getBuffer() -> " << it->getBuffer() << std::endl;
-					// 		std::cout << "BufferSize() -> " << it->getBufferSize() << std::endl;
-					// 	}
-					// std::cout << "getBuffer() -> " << getClient(i)->getBuffer() << std::endl;
-					// std::cout << "BufferSize() -> " << getClient(i)->getBufferSize() << std::endl;
-					// char buff[4096];
-        			// ssize_t  = recv(i, buff, sizeof(i), 0);
+					char buffer[RECV_SIZE] = {0};
+					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
 					if (rec <= 0)
 					{
 						FD_CLR(i, &backupRead);
@@ -167,12 +155,15 @@ void Server::start(pars &parsing)
 							FD_SET(i, &backupWrite);
 							continue;
 						}
-						isClient(i) && close(i);
+						removeClient(i, _clients);
 						break;
 					}
 					else
 					{
-						std::string request(buff, rec);
+						std::cout << "buff -- >"  << _clients[i] << std::endl;
+						_clients[i] += std::string(buffer);
+						std::cout << "buff -- >"  << _clients[i] << std::endl;
+						std::string request(buffer, rec);
 						std::cout << request << std::endl;
 						parsing.fill_request(request);
 						parsing.respons(i);
@@ -187,7 +178,8 @@ void Server::start(pars &parsing)
 					if (ret <= 0)
 					{
 						FD_CLR(i, &backupWrite);
-						isClient(i) && close(i);
+						removeClient(i, _clients);
+						// // isClient(i) &&// close(i);
 					}
 				}
 			}

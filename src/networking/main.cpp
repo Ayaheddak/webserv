@@ -1,19 +1,17 @@
-#include "../../includes/Server.hpp"
 #include "../../includes/parsing.hpp"
-
-void check_arguments(int argc,char **argv)
+#include "../../includes/Server.hpp"
+void check_arguments(int argc)
 {
     if(argc > 2)
     {
         std::cerr<<"Too many arguments" << std::endl;
         exit(1);
     }
-    (void)argv;
 }
 int main(int argc,char **argv) 
 {
     std::list<std::pair<std::string, std::string> > _port;
-    check_arguments(argc,argv);
+    check_arguments(argc);
     pars parsing(argv[1]);
     std::vector<data>::iterator it;
     for (it = parsing.s_data.begin(); it != parsing.s_data.end(); it++)

@@ -38,7 +38,9 @@ class data
     std::vector<std::string> methods;
     std::vector<loc> location;
 };
-class request{
+
+class request
+{
     public :
     std::string method;
     int status;

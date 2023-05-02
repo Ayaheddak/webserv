@@ -24,6 +24,7 @@
 #define PORT                8080
 #define TRUE                1
 #define FALSE               0
-#define BUFFER_SIZE         1024
+#define RECV_SIZE           3000
+#define SEND_SIZE           3000
 
 #endif
