@@ -1,5 +1,6 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/parsing.hpp"
+#include <limits>
 Server::Server()
 {
 }
@@ -165,14 +166,13 @@ void Server::start(pars &parsing)
 						std::cout << "buff -- >"  << _clients[i] << std::endl;
 						std::string request(buffer, rec);
 						std::cout << request << std::endl;
-						parsing.fill_request(request);
+						parsing.r_data.fill_request(request);
 						parsing.respons(i);
 						//client.lenght += rec; 
 					}
 				}
-				else if (FD_ISSET(i, &writeFds))
-				{
-					char *buff; // generated response string
+				/*else if (FD_ISSET(i, &writeFds))
+				{// generated response string
 					int contentLenght = 1000; // calculated content leght 
 					int ret = write(i, buff,  contentLenght);
 					if (ret <= 0)
@@ -181,7 +181,7 @@ void Server::start(pars &parsing)
 						removeClient(i, _clients);
 						// // isClient(i) &&// close(i);
 					}
-				}
+				}*/
 			}
 		}
 	}

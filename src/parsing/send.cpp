@@ -14,7 +14,7 @@ void pars::respons_200(std::string index)
     }
     std::cout << index.c_str() << std::endl;
     response << "HTTP/1.1 200 OK\r\n";
-    response << "Content-Type: text/html; charset=UTF-8\r\n";
+    response << "Content-Type: "<< r_data.gettype() <<"\r\n";
     response << "Content-Length: " << response_body.length() << "\r\n";
     response << "\r\n";
     response << response_body;
@@ -22,7 +22,7 @@ void pars::respons_200(std::string index)
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 
 }
 void pars::res_location(std::vector<loc>::iterator it)
@@ -32,13 +32,13 @@ void pars::res_location(std::vector<loc>::iterator it)
 void pars::check_location()
 {
     int c = 0;
-    if(!r_data.url.empty())
+    if(r_data.getPath() != "")
     {
         std::vector<loc>::iterator it;
         for (it = s_data[0].location.begin(); it != s_data[0].location.end(); it++)
         {
             std::cout << it->s_return << std::endl;
-            if(it->path == r_data.url || r_data.url == it->s_return)
+            if(it->path == r_data.getPath() || r_data.getPath() == it->s_return)
             {
                 c = 1;
                 break;
@@ -75,7 +75,7 @@ void pars::respons_201(std::string index)
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 
 }
 void pars::respons_204()
@@ -91,7 +91,7 @@ void pars::respons_204()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 
 }
 void pars::respons_301()
@@ -108,24 +108,24 @@ void pars::respons_301()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 
 }
 void pars::respons(int client_sock)
 {
-    if(r_data.url == s_data[0].location[0].path && !s_data[0].location[0].s_return.empty())
+    if(r_data.getPath() == s_data[0].location[0].path && !s_data[0].location[0].s_return.empty())
     {
         respons_301();
     }
     if(count == 0)
         respons_405();
-    else if(r_data.method == "GET")
+    else if(r_data.getMethod() == "GET")
         check_location();
-    else if(r_data.method == "POST")
+    else if(r_data.getMethod() == "POST")
         respons_201("index1.html");
-    else if(r_data.method == "DELETE")
+    else if(r_data.getMethod() == "DELETE")
         respons_204();
-    send(client_sock, r_data.response_buf ,strlen(r_data.response_buf), 0);
-    r_data.response_buf = 0;
-    r_data.url = "";
+    send(client_sock, response_buf1 ,strlen(response_buf1), 0);
+    response_buf1 = 0;
+
 }

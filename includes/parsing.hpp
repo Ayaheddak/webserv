@@ -1,6 +1,7 @@
 #ifndef PARSING_HPP
 #define PARSING_HPP
 
+#include "Request.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -39,22 +40,15 @@ class data
     std::vector<loc> location;
 };
 
-class request
-{
-    public :
-    std::string method;
-    int status;
-    char *response_buf;
-    std::string url;
-};
 class pars
 {
     public:
     int sockfd;
     std::ifstream inputfile;
     std::string f_data;
-    std::vector<data> s_data; 
-    request r_data;
+    std::vector<data> s_data;
+    char *response_buf1;
+    Request r_data;
     int count;
     pars(char *str);
     void check_data();

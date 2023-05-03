@@ -1,6 +1,7 @@
 #include "../../includes/parsing.hpp"
+#include "../../includes/Request.hpp"
 
-void pars::fill_request(std::string str)
+void Request::fill_request(std::string str)
 {
     std::string data = str.substr(0,str.find("\r\n"));
     std::cout << data<< std::endl;
@@ -12,16 +13,43 @@ void pars::fill_request(std::string str)
     // }
     if(data[data.find("/")+1] != ' ' && data.find("/cover.css") == std::string::npos)
     {
-        s >> r_data.method;
-        s >> r_data.url;
+        s >> method;
+        s >> path;
+        s >> version;
     }
     else
-        s >> r_data.method;
-    std::stringstream a(s_data[0].allow_methods);
-    std::string word;
-    count = 0;
-    while (a >> word) {
-       if(word == r_data.method)
-            count = 1;
+    {
+        s >> method;
+        s >> version;
     }
+    if(str.find("Accept:") != std::string::npos)
+    {
+        type = str.substr(str.find("Accept:"),str.find(",",str.find("Accept:")) - str.find("Accept:"));
+        type = type.erase(0,type.find(" ") + 1);
+        std::cout <<type <<std::endl;
+    }
+    if(str.find("\r\n\r\n") + 1 != std::string::npos)
+    {
+        body = str.substr(str.find("\r\n\r\n") + 1,str.length());
+    }
+}
+std::string Request::getMethod() const
+{
+    return(method);
+}
+std::string Request::getPath() const
+{
+    return(path);
+}
+std::string Request::getVersion() const
+{
+    return(version);
+}
+std::string Request::getBody() const
+{
+    return(body);
+}
+std::string Request::gettype()const
+{
+    return(type);
 }

@@ -24,7 +24,7 @@ void pars::respons_404()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 
 void pars::respons_400()
@@ -39,7 +39,7 @@ void pars::respons_400()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 void pars::respons_403()
 {
@@ -53,7 +53,7 @@ void pars::respons_403()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 void pars::respons_405()
 {
@@ -68,7 +68,7 @@ void pars::respons_405()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 
 void pars::respons_413()
@@ -83,7 +83,7 @@ void pars::respons_413()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 void pars::respons_500()
 {
@@ -97,7 +97,7 @@ void pars::respons_500()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }
 void pars::respons_504()
 {
@@ -111,5 +111,5 @@ void pars::respons_504()
     char* response_buf = new char[response_str.size() + 1];
     std::copy(response_str.begin(), response_str.end(), response_buf);
     response_buf[response_str.size()] = '\0';
-    r_data.response_buf = response_buf;
+    response_buf1 = response_buf;
 }

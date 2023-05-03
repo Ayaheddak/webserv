@@ -4,20 +4,18 @@
 class Request
 {
     private :
-        std::string                 _method;
-        std::string                 _path;
-        std::string                 _version;
-        std::map<string, string>    _headers;
-        std::string                 _body;
-        void parse_request_line(const string& request_line);
-        std::map<string, string> parse_headers(const string& headers);
-        std::vector<string> parse_request(const string& request);
+        std::string                 method;
+        std::string                 path;
+        std::string                 version;
+        std::string                 body;
+        std::string                 type;
     public :
-        Request(const string& request);
+        Request(){}
+        void fill_request(std::string str);
         std::string getMethod() const;
         std::string getPath() const;
         std::string getVersion() const;
-        std::map<string, string> getHeaders() const;
         std::string getBody() const;
+        std::string gettype() const;
 };
 #endif
