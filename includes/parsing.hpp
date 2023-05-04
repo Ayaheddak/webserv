@@ -17,13 +17,13 @@
 class loc
 {
     public:
-    std::string path;
-    std::string autoindex;
+    std::string path;//yes
+    std::string autoindex;//yes
     std::string s_return;
     std::string alias;
-    std::string allow_methods;
-    std::string root;
-    std::string index;
+    std::string allow_methods;//yes
+    std::string root;//yes
+    std::string index;//yes
 };
 
 class data
