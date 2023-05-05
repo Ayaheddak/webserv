@@ -109,7 +109,7 @@ void Server::start(pars &parsing)
 		}
 	while (true)
 	{
-		std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
+		//std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
 
 		timeout.tv_sec = 5;
 		timeout.tv_usec = 0;
@@ -148,40 +148,29 @@ void Server::start(pars &parsing)
 				{
 					char buffer[RECV_SIZE] = {0};
 					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
-					if (rec <= 0)
-					{
-						FD_CLR(i, &backupRead);
-						if (rec == 0)
-						{
-							FD_SET(i, &backupWrite);
-							continue;
-						}
-						removeClient(i, _clients);
-						break;
-					}
-					else
-					{
-						std::cout << "buff -- >"  << _clients[i] << std::endl;
-						_clients[i] += std::string(buffer);
-						std::cout << "buff -- >"  << _clients[i] << std::endl;
-						std::string request(buffer, rec);
-						std::cout << request << std::endl;
-						parsing.r_data.fill_request(request);
-						parsing.respons(i);
+						//std::cout << "buff -- >"  << _clients[i] << std::endl;
+						//_clients[i] += std::string(buffer);
+						//std::cout << "buff -- >"  << _clients[i] << std::endl;
+						std::string buff(buffer, buffer+rec);
+							parsing.r_data.request_append(buffer,rec);
+							if (rec <= 0)
+							{
+								FD_CLR(i, &backupRead);
+								if (rec == 0)
+								{
+									FD_SET(i, &backupWrite);									continue;
+								}
+								//removeClient(i, _clients);
+								break;
+							}
 						//client.lenght += rec; 
-					}
 				}
-				/*else if (FD_ISSET(i, &writeFds))
+				else if (FD_ISSET(i, &writeFds))
 				{// generated response string
-					int contentLenght = 1000; // calculated content leght 
-					int ret = write(i, buff,  contentLenght);
-					if (ret <= 0)
-					{
-						FD_CLR(i, &backupWrite);
-						removeClient(i, _clients);
-						// // isClient(i) &&// close(i);
-					}
-				}*/
+					//std::cout << "hadgfadsfas" << std::endl;
+					parsing.respons(i);
+
+				}
 			}
 		}
 	}
