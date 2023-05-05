@@ -18,6 +18,7 @@ class Request
         size_t                              len;
     public :
         Request(){ status = false; k = 1; read = false;}
+        void  clear();
         void request_append(const char *str,int length);
         void parse_header();
         void fill_header();
@@ -26,5 +27,7 @@ class Request
         std::string getPath() const;
         std::string getVersion() const;
         std::fstream &getBody();
+        bool getread();
+        int  getk();
 };
 #endif

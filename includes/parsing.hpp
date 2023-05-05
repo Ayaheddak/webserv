@@ -49,6 +49,7 @@ class pars
     std::vector<data> s_data;
     char *response_buf1;
     Request r_data;
+    int c;
     int count;
     pars(char *str);
     void check_data();

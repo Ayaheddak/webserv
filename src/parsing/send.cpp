@@ -188,11 +188,12 @@ void pars::respons(int client_sock)
     }
     //if(count == 0)
     //    respons_405();
+    std::cout << r_data.getPath() << std::endl;
     if(r_data.getMethod() == "GET")
         check_location();
     else if(r_data.getMethod() == "POST")
         respons_201("index1.html");
     else if(r_data.getMethod() == "DELETE")
         respons_204();
-    send(client_sock, response_buf1 ,strlen(response_buf1), 0);
+    c = send(client_sock, response_buf1 ,strlen(response_buf1), 0);
 }

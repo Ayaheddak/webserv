@@ -3,6 +3,7 @@
 
 void Request::request_append(const char *str,int length)
 {
+    
         if(k == -2 && length == 0)
         {
             read = true;
@@ -12,21 +13,25 @@ void Request::request_append(const char *str,int length)
         {
             request.append(str,length);
         }
-        else if(request.find("\r\n\r\n") && k > 0)
+        if(request.find("\r\n\r\n") && k > 0)
         {
             k = 0;
-            if(request.find("POST") || request.find("DELETE"))
+            if(request.find("POST") != std::string::npos|| request.find("DELETE")!=std::string::npos)
             {
                 body.open("body", std::ios::binary | std::ios::in | std::ios::out);
                 status = true;
             }
+            else
+            {
+                read = true;
+            }
             fill_header();
         }
-        else if(k > 0 && length > 0)
+        /*else if(k > 0 && length > 0)
             body.write(str,length);
         len = len + length;
         if(len == content_length)
-            read = true;
+            read = true;*/
 }
 void        Request::parse_header()
 {
@@ -85,7 +90,7 @@ void Request::fill_header()
     //     if(data[i] == ' ')
     //         count++;
     // }
-    if(data[data.find("/")+1] != ' ' )
+    if(data[data.find("/")+1] != ' ' && data.find("/cover.css") == std::string::npos)
     {
         s >> method;
         s >> path;
@@ -117,4 +122,20 @@ std::fstream &Request::getBody()
 std::map<std::string, std::string> Request::getheader() const
 {
     return(header);
+}
+bool Request::getread() 
+{
+    return read;
+}
+int  Request::getk() 
+{
+    return k;
+}
+void Request::clear()
+{
+    status = false; k = 1; read = false;
+    request = "";
+    path = "";
+    version = "";
+    
 }

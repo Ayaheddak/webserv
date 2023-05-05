@@ -109,12 +109,12 @@ void Server::start(pars &parsing)
 		}
 	while (true)
 	{
-		//std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
+		std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
 
 		timeout.tv_sec = 5;
 		timeout.tv_usec = 0;
-		FD_ZERO(&readFds);
-		FD_ZERO(&writeFds);
+		// FD_ZERO(&readFds);
+		// FD_ZERO(&writeFds);
 
 		readFds = backupRead; // cuz select is destructive
 		writeFds = backupWrite;
@@ -141,35 +141,47 @@ void Server::start(pars &parsing)
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					_clients.insert(std::make_pair(clientSocket, "")); 
-					break;
+					_clients.insert(std::make_pair(clientSocket, ""));
+					break ;
 				}
 				else if (FD_ISSET(i, &readFds))
 				{
 					char buffer[RECV_SIZE] = {0};
 					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
-						//std::cout << "buff -- >"  << _clients[i] << std::endl;
-						//_clients[i] += std::string(buffer);
-						//std::cout << "buff -- >"  << _clients[i] << std::endl;
-						std::string buff(buffer, buffer+rec);
-							parsing.r_data.request_append(buffer,rec);
-							if (rec <= 0)
-							{
-								FD_CLR(i, &backupRead);
-								if (rec == 0)
-								{
-									FD_SET(i, &backupWrite);									continue;
-								}
-								//removeClient(i, _clients);
-								break;
-							}
-						//client.lenght += rec; 
+					if (rec < 0)
+					{
+						FD_CLR(i, &backupRead);
+						FD_CLR(i, &backupWrite);
+						removeClient(i, _clients);
+						close(i);
+					}
+					parsing.r_data.request_append(buffer,rec);
+					if (parsing.r_data.getread() == true ||( parsing.r_data.getk() == -1 && rec == 0))
+					{
+						std::cout << "hello im here in cond " << std::endl;
+						FD_CLR(i, &backupRead);
+						FD_SET(i, &backupWrite);
+						break ;
+					}
 				}
 				else if (FD_ISSET(i, &writeFds))
-				{// generated response string
+				{
+					
+					std::cout << "im here in response " << std::endl;
+					// generated response string
 					//std::cout << "hadgfadsfas" << std::endl;
 					parsing.respons(i);
+					parsing.r_data.clear();
+					if(parsing.c <= 0)
+					{
+						FD_CLR(i, &backupWrite);
+						close (i);
+						parsing.c = -4;
+						// FD_SET(i, &backupWrite);
+						break ;
 
+					}
+					//std::cout << "done" << std::endl;
 				}
 			}
 		}
