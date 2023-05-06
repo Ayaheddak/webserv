@@ -72,28 +72,32 @@ std::string get_f_type(std::string str)
 }
 void pars::respons_200(std::string index)
 {
-    std::ifstream html_file;
     std::ostringstream response;
-    std::string response_body;
     std::string line;
-
-    html_file.open(index.c_str());
-    while (getline(html_file, line))
+    if(!html_file.is_open())
     {
-        response_body += line + "\n";
+        glen = 0;
+          html_file.open(index.c_str(), std::ios::in | std::ios::binary);
+         html_file.seekg (0, html_file.end);
+            length = html_file.tellg();
+            html_file.seekg (0, html_file.beg);
+        response << "HTTP/1.1 200 OK\r\n";
+        response << "Content-Type: "<< get_f_type(index) <<"\r\n";
+        response << "Content-Length: " << length << "\r\n";
+        response << "\r\n";
+        std::string str = response.str();
+        str.copy(response_buf2,str.length());
+        response_buf2[str.length()] = '\0';
+        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
+        len = strlen(response_buf2);
     }
-
-    response << "HTTP/1.1 200 OK\r\n";
-    response << "Content-Type: "<< get_f_type(index) <<"\r\n";
-    response << "Content-Length: " << response_body.length() << "\r\n";
-    response << "\r\n";
-    response << response_body;
-    std::string response_str = response.str();
-    char* response_buf = new char[response_str.size() + 1];
-    std::copy(response_str.begin(), response_str.end(), response_buf);
-    response_buf[response_str.size()] = '\0';
-    response_buf1 = response_buf;
-
+    else
+    {
+        html_file.read(response_buf2, 65536);
+        len = html_file.gcount();
+        std::cout << len << std::endl;
+        glen = len + glen;
+    }
 }
 void pars::res_location(std::vector<loc>::iterator it)
 {
@@ -182,18 +186,15 @@ void pars::respons_301()
 }
 void pars::respons(int client_sock)
 {
-    if(r_data.getPath() == s_data[0].location[0].path && !s_data[0].location[0].s_return.empty())
-    {
-        respons_301();
-    }
     //if(count == 0)
     //    respons_405();
+    len = 0;
+    c = 1;
     std::cout << r_data.getPath() << std::endl;
-    if(r_data.getMethod() == "GET")
-        check_location();
-    else if(r_data.getMethod() == "POST")
-        respons_201("index1.html");
-    else if(r_data.getMethod() == "DELETE")
-        respons_204();
-    c = send(client_sock, response_buf1 ,strlen(response_buf1), 0);
+    check_location();
+    send(client_sock, response_buf2 ,len, 0);
+    if(len == 0)
+    {
+        c = -1;
+    }
 }
