@@ -44,10 +44,16 @@ class pars
 {
     public:
     int sockfd;
-    std::ifstream inputfile;
+    std::fstream html_file;
     std::string f_data;
-    std::vector<data> s_data;
+    long glen;
+    long length;
+    std::ifstream inputfile;
+    char response_buf2[65536];
     char *response_buf1;
+    long len;
+
+    std::vector<data> s_data;
     Request r_data;
     int c;
     int count;

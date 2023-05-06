@@ -111,7 +111,7 @@ void Server::start(pars &parsing)
 	{
 		std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
 
-		timeout.tv_sec = 5;
+		timeout.tv_sec = 20;
 		timeout.tv_usec = 0;
 		// FD_ZERO(&readFds);
 		// FD_ZERO(&writeFds);
@@ -156,6 +156,7 @@ void Server::start(pars &parsing)
 						close(i);
 					}
 					parsing.r_data.request_append(buffer,rec);
+					std::cout <<  buffer  << std::endl;
 					if (parsing.r_data.getread() == true ||( parsing.r_data.getk() == -1 && rec == 0))
 					{
 						std::cout << "hello im here in cond " << std::endl;
@@ -172,11 +173,15 @@ void Server::start(pars &parsing)
 					//std::cout << "hadgfadsfas" << std::endl;
 					parsing.respons(i);
 					parsing.r_data.clear();
+					if(parsing.c == 9)
+					{
+						break;
+					}
 					if(parsing.c <= 0)
 					{
-						FD_CLR(i, &backupWrite);
 						close (i);
-						parsing.c = -4;
+						FD_CLR(i, &backupWrite);
+						parsing.c = 0;
 						// FD_SET(i, &backupWrite);
 						break ;
 

@@ -108,6 +108,7 @@ void pars::check_location()
     int c = 0;
     if(r_data.getPath() != "")
     {
+        std::cout <<"adadada"<< std::endl;
         std::vector<loc>::iterator it;
         for (it = s_data[0].location.begin(); it != s_data[0].location.end(); it++)
         {
@@ -126,7 +127,7 @@ void pars::check_location()
         respons_200(it->index);
         return;
     }
-     respons_200(s_data[0].index);
+    respons_200(s_data[0].index);
 }
 void pars::respons_201(std::string index)
 {
@@ -192,9 +193,11 @@ void pars::respons(int client_sock)
     c = 1;
     std::cout << r_data.getPath() << std::endl;
     check_location();
-    send(client_sock, response_buf2 ,len, 0);
-    if(len == 0)
+    if(len > 0)
+       send(client_sock, response_buf2 ,len, 0);
+    else
     {
         c = -1;
+        html_file.close();
     }
 }
