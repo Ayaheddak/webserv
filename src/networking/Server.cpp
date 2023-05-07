@@ -55,29 +55,19 @@ bool Server::isListener(int fd)
 	return (FALSE);
 }
 
-// bool Server::isClient(int fd)
-// {
-//     for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
-//     {
-//         if (it->getClientFd() == fd)
-//         {
-//             _clients.erase(it);
-//             return (TRUE);
-//         }
-//     }
-//     return (FALSE);
-// }
+bool Server::isClient(int fd)
+{
+    for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
+    {
+        if (it->getClientFd() == fd)
+        {
+            _clients.erase(it);
+            return (TRUE);
+        }
+    }
+    return (FALSE);
+}
 
-// std::list<Client>::iterator	Server::getClient(int fd)
-// {
-//     std::list<Client>::iterator it;
-//     for (it = _clients.begin(); it != _clients.end(); ++it)
-// 	{
-//         if (it->getClientFd() == fd) 
-//             return it;
-//     }
-//     return std::list<Client>::iterator();
-//
 void Server::removeClient(int i, std::map<int, std::string> &client)
 {
 	client.erase(i);
@@ -109,12 +99,12 @@ void Server::start(pars &parsing)
 		}
 	while (true)
 	{
-		std::cout << "+++++++ Waiting for new connection ++++++++    " << maxFds << std::endl;
+		std::cout << "+++++++ Waiting for new connection ++++++++ fd = " << maxFds << std::endl;
 
 		timeout.tv_sec = 20;
 		timeout.tv_usec = 0;
-		// FD_ZERO(&readFds);
-		// FD_ZERO(&writeFds);
+		FD_ZERO(&readFds);
+		FD_ZERO(&writeFds);
 
 		readFds = backupRead; // cuz select is destructive
 		writeFds = backupWrite;
@@ -141,7 +131,8 @@ void Server::start(pars &parsing)
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					_clients.insert(std::make_pair(clientSocket, ""));
+					Client c(clientSocket);
+					_clients.push_back(c);
 					break ;
 				}
 				else if (FD_ISSET(i, &readFds))
@@ -152,15 +143,13 @@ void Server::start(pars &parsing)
 					{
 						FD_CLR(i, &backupRead);
 						FD_CLR(i, &backupWrite);
-						removeClient(i, _clients);
-						close(i);
+						isClient(i)	&& close(i);
 					}
 					parsing.r_data.request_append(buffer,rec);
-					std::cout <<  buffer  << std::endl;
 					if (parsing.r_data.getread() == true ||( parsing.r_data.getk() == -1 && rec == 0))
 					{
 						std::cout << "hello im here in cond " << std::endl;
-						FD_CLR(i, &backupRead);
+						FD_CLR(i, &backupRead); 
 						FD_SET(i, &backupWrite);
 						break ;
 					}
@@ -169,24 +158,21 @@ void Server::start(pars &parsing)
 				{
 					
 					std::cout << "im here in response " << std::endl;
-					// generated response string
-					//std::cout << "hadgfadsfas" << std::endl;
 					parsing.respons(i);
 					parsing.r_data.clear();
 					if(parsing.c == 9)
 					{
+						std::cout << "im here " << std::endl;
 						break;
 					}
 					if(parsing.c <= 0)
 					{
-						close (i);
+						isClient(i) && close (i);
 						FD_CLR(i, &backupWrite);
 						parsing.c = 0;
-						// FD_SET(i, &backupWrite);
 						break ;
 
 					}
-					//std::cout << "done" << std::endl;
 				}
 			}
 		}

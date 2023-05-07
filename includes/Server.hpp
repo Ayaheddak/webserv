@@ -3,14 +3,13 @@
 
 #include "Utils.hpp"
 #include "parsing.hpp"
-// #include "Client.hpp"
+#include "Client.hpp"
 class Server
 {
     private :
 		std::list<std::pair<std::string, std::string> > 		                _infoconfig;
         std::list<std::pair <std::pair<std::string, std::string>, int> >  	    _listners;
-        std::map<int, std::string>                                              _clients;
-        // std::list<Client>                                                       _clients;
+        std::list<Client>                                              			_clients;
     public :
         Server();
 		Server(std::list<std::pair<std::string, std::string> > infoconfig);
@@ -25,6 +24,7 @@ class Server
 		// std::list<Client>::iterator	getClient(int fd);
         void Form();
         void start(pars &parsing);
+		bool isClient(int fd);
         /*
             =============================== exceptions ===================================== 
         */
