@@ -70,35 +70,7 @@ std::string get_f_type(std::string str)
     return "application/octet-stream";
 
 }
-void pars::respons_200(std::string index)
-{
-    std::ostringstream response;
-    std::string line;
-    if(!html_file.is_open())
-    {
-        glen = 0;
-          html_file.open(index.c_str(), std::ios::in | std::ios::binary);
-         html_file.seekg (0, html_file.end);
-            length = html_file.tellg();
-            html_file.seekg (0, html_file.beg);
-        response << "HTTP/1.1 200 OK\r\n";
-        response << "Content-Type: "<< get_f_type(index) <<"\r\n";
-        response << "Content-Length: " << length << "\r\n";
-        response << "\r\n";
-        std::string str = response.str();
-        str.copy(response_buf2,str.length());
-        response_buf2[str.length()] = '\0';
-        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
-        len = strlen(response_buf2);
-    }
-    else
-    {
-        html_file.read(response_buf2, 65536);
-        len = html_file.gcount();
-        std::cout << len << std::endl;
-        glen = len + glen;
-    }
-}
+
 void pars::res_location(std::vector<loc>::iterator it)
 {
     respons_200(it->index);
@@ -131,27 +103,43 @@ void pars::check_location()
 }
 void pars::respons_201(std::string index)
 {
-    std::ifstream html_file;
+    index = "";/*
     std::ostringstream response;
-    std::string response_body;
     std::string line;
-
-    html_file.open(index.c_str());
-    while (getline(html_file, line))
+    if(!html_file.is_open())
     {
-        response_body += line + "\n";
+        std::map<std::string, std::string>  header;
+        glen = 0;
+        body = r_data.getBody();
+        header = r_data.getheader();
+        html_file.open(index.c_str(), std::ios::out | std::ios::binary);
+        html_file.seekg (0, html_file.end);
+        length = 
+        html_file.seekg (0, html_file.beg);
     }
-    response << "HTTP/1.1 201 OK\r\n";
-    response << "Content-Type: text/html; charset=UTF-8\r\n";
-    response << "Content-Length: " << response_body.length() << "\r\n";
-    response << "\r\n";
-    response << response_body;
-    std::string response_str = response.str();
-    char* response_buf = new char[response_str.size() + 1];
-    std::copy(response_str.begin(), response_str.end(), response_buf);
-    response_buf[response_str.size()] = '\0';
-    response_buf1 = response_buf;
-
+    if(glen < length)
+    {
+        len = 0;
+        body.read(response_buf2, 65536);
+        html_file.write(response_buf2, 65536);
+        glen = length + glen;
+    }
+    else
+    {
+        response << "HTTP/1.1 201 OK\r\n";
+        response << "Content-Type: text/html\r\n";
+        response << "Content-Length: 9\r\n";
+        response << "\r\n";
+        response<< "File saved";
+        std::string str = response.str();
+        str.copy(response_buf2,str.length());
+        response_buf2[str.length()] = '\0';
+        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
+        len = strlen(response_buf2);
+        c = -3;
+        html_file.close();
+    }
+    */
 }
 void pars::respons_204()
 {
@@ -185,17 +173,63 @@ void pars::respons_301()
     response_buf[response_str.size()] = '\0';
     response_buf1 = response_buf;
 }
+void pars::respons_200(std::string index)
+{
+    std::stringstream response;
+    std::string line;
+    if(!html_file.is_open())
+    {
+        glen = 0;
+        html_file.open(index.c_str(), std::ios::in | std::ios::binary);
+        html_file.seekg (0, html_file.end);
+        length = html_file.tellg();
+        html_file.seekg (0, html_file.beg);
+        response << "HTTP/1.1 200 OK\r\n";
+        response << "Content-Type: "<< get_f_type(index) <<"\r\n";
+        response << "Content-Length: " << length << "\r\n";
+        response << "Connection: close"<< "\r\n";
+        response << "\r\n";
+        std::string str = response.str();
+        str.copy(response_buf2,str.length());
+        response_buf2[str.length()] = '\0';
+        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
+        len = strlen(response_buf2);
+    }
+    else
+    {
+        html_file.read(response_buf2, 6000);
+        len = html_file.gcount();
+        std::cout << len << std::endl;
+        glen = len + glen;
+    }
+}
 void pars::respons(int client_sock)
 {
     //if(count == 0)
-    //    respons_405();
+    //    respons_405()
     len = 0;
     c = 1;
     std::cout << r_data.getPath() << std::endl;
-    check_location();
-    if(len > 0)
-       send(client_sock, response_buf2 ,len, 0);
-    else
+    if(r_data.getMethod() == "GET")
+        check_location();
+    else if(r_data.getMethod() == "POST")
+    {
+        respons_201("src/parsing/index.html");
+    }
+    int i;
+    if(len > 0 || c == -3)
+    {
+       i = send(client_sock, response_buf2 ,len, MSG_NOSIGNAL);
+       if(i == -1 && (errno == EPIPE || errno == ECONNRESET))
+       {
+            c = -4;
+       }
+       else if(i == 0) 
+          exit(0);
+        else 
+             c = 1;
+    }
+    else if(length == glen)
     {
         c = -1;
         html_file.close();

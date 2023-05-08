@@ -49,7 +49,7 @@ class pars
     long glen;
     long length;
     std::ifstream inputfile;
-    char response_buf2[65536];
+    char response_buf2[6000];
     char *response_buf1;
     long len;
 

@@ -159,14 +159,14 @@ void Server::start(pars &parsing)
 					
 					std::cout << "im here in response " << std::endl;
 					parsing.respons(i);
-					parsing.r_data.clear();
-					if(parsing.c == 9)
+					if(parsing.c == -4)
 					{
 						std::cout << "im here " << std::endl;
 						break;
 					}
 					if(parsing.c <= 0)
 					{
+						parsing.r_data.clear();
 						isClient(i) && close (i);
 						FD_CLR(i, &backupWrite);
 						parsing.c = 0;
