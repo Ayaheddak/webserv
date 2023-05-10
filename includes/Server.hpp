@@ -19,9 +19,7 @@ class Server
         std::pair <std::pair<std::string, std::string>, int> create(std::pair <std::string , std::string > infos);
         bool isListener(int fd);
 		// bool isClient(int fd);
-        void removeClient(int i, std::map<int, std::string> &client);//,fd_set &backupread, fd_set &backupwrite, bool b);
-        // void	Socket::remove_client(int i, std::map<int,  Client> &clients, bool rd, bool wr);
-		// std::list<Client>::iterator	getClient(int fd);
+        void removeClient(int i, std::map<int, std::string> &client);
         void Form();
         void start(pars &parsing);
 		bool isClient(int fd);

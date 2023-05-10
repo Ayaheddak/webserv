@@ -1,13 +1,16 @@
-#include "parsing.hpp"
-// bool duplicate_server(std::vector<Config>& servers, Config& s)
-// {
-// 	std::vector<Config>::iterator it;
-// 	for (it = servers.begin(); it != servers.end(); it++)
-// 		if (it->getServerName() == s.getServerName() && it->getListen() == s.getListen() && it->getServerName() == s.getServerName())
-// 			return (true);
-// 	return (false);
-// }
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handle_files.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
+/*   Updated: 2023/05/10 16:55:47 by aheddak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "parsing.hpp"
 void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 {
 	std::ifstream infile(inputfile);

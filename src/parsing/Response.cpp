@@ -1,6 +1,8 @@
 #include "../../includes/Response.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
+#include <sys/types.h>
+#include <sys/socket.h>
 std::string get_f_type(std::string str)
 {
     std::string type = str.erase(0,str.find("."));
@@ -220,7 +222,7 @@ void Response::respons(int client_sock,pars parsing)
     int i;
     if(len > 0 || c == -3)
     {
-       i = send(client_sock, response_buf2 ,len, MSG_NOSIGNAL);
+       i = send(client_sock, response_buf2 ,len,0);
        if(i == -1 && (errno == EPIPE || errno == ECONNRESET))
        {
             c = -4;

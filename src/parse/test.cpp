@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   test.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/10 16:55:58 by aheddak           #+#    #+#             */
+/*   Updated: 2023/05/10 16:56:00 by aheddak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/Utils.hpp"
 #include "parsing.hpp"
 bool isDuplicateServer(std::vector<Config>& servers, Config server)
