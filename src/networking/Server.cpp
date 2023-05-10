@@ -137,6 +137,12 @@ void Server::start(pars &parsing)
 				}
 				else if (FD_ISSET(i, &readFds))
 				{
+					std::list<Client>::iterator it;
+					for (it = _clients.begin(); it != _clients.end(); ++it)
+   					{
+   					    if(it->_clientFd == i)
+							break;
+   					}
 					char buffer[RECV_SIZE] = {0};
 					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
 					if (rec < 0)
@@ -145,8 +151,8 @@ void Server::start(pars &parsing)
 						FD_CLR(i, &backupWrite);
 						isClient(i)	&& close(i);
 					}
-					parsing.r_data.request_append(buffer,rec);
-					if (parsing.r_data.getread() == true ||( parsing.r_data.getk() == -1 && rec == 0))
+					it->res_data.r_data.request_append(buffer,rec);
+					if (it->res_data.r_data.getread() == true ||( it->res_data.r_data.getk() == -1 && rec == 0))
 					{
 						std::cout << "hello im here in cond " << std::endl;
 						FD_CLR(i, &backupRead); 
@@ -156,22 +162,20 @@ void Server::start(pars &parsing)
 				}
 				else if (FD_ISSET(i, &writeFds))
 				{
-					
+					std::list<Client>::iterator it;
+					for (it = _clients.begin(); it != _clients.end(); ++it)
+   					{
+   					    if(it->_clientFd == i)
+							break;
+   					}
 					std::cout << "im here in response " << std::endl;
-					parsing.respons(i);
-					if(parsing.c == -4)
+					it->res_data.respons(i,parsing);
+					if(it->res_data.c <= 0)
 					{
-						std::cout << "im here " << std::endl;
-						break;
-					}
-					if(parsing.c <= 0)
-					{
-						parsing.r_data.clear();
+						it->res_data.r_data.clear();
 						isClient(i) && close (i);
 						FD_CLR(i, &backupWrite);
-						parsing.c = 0;
 						break ;
-
 					}
 				}
 			}

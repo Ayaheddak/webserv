@@ -43,20 +43,26 @@ class data
 class pars
 {
     public:
-    int sockfd;
-    std::fstream html_file;
     std::string f_data;
-    long glen;
-    long length;
     std::ifstream inputfile;
-    char response_buf2[6000];
-    char *response_buf1;
-    long len;
-
     std::vector<data> s_data;
-    Request r_data;
-    int c;
-    int count;
+    
+    pars(const pars& other)
+        : f_data(other.f_data),
+          s_data(other.s_data)
+    {
+    }
+    pars& operator=(const pars& other)
+    {
+        if (this == &other)
+            return *this;
+
+        f_data = other.f_data;
+        s_data = other.s_data;
+
+        return *this;
+    }
+    pars(){}
     pars(char *str);
     void check_data();
     size_t location(size_t n,data &server);
@@ -76,22 +82,6 @@ class pars
     size_t alias(std::string &src,size_t n,std::string &str);
     size_t autoindex(std::string &src,size_t n,std::string &str);
     void check_syntax(size_t i);
-    void split_methods(std::string str,data &server);
-    void fill_request(std::string str);
-    void respons(int client_sock);
-    void respons_200(std::string index);
-    void res_location(std::vector<loc>::iterator it);
-    void check_location(void);
-    void respons_404(void);
-    void respons_201(std::string index);
-    void respons_204(void);
-    void respons_301(void);
-    void respons_400(void);
-    void respons_403(void);
-    void respons_405(void);
-    void respons_413(void);
-    void respons_500(void);
-    void respons_504(void);
 };  
 size_t whitespaces(std::string str,size_t n);
 size_t fill_data(std::string str,std::string dest,size_t n , std::string &data);

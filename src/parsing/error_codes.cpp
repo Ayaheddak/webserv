@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/parsing.hpp"
+#include "../../includes/Response.hpp"
 
-void pars::respons_404()
+void Response::respons_404()
 {
     std::ostringstream response;
     response << "HTTP/1.1 404 Not Found\r\n";
@@ -27,7 +27,7 @@ void pars::respons_404()
     response_buf1 = response_buf;
 }
 
-void pars::respons_400()
+void Response::respons_400()
 {
     std::ostringstream response;
     response << "HTTP/1.1 400 Bad Request\r\n";
@@ -41,7 +41,7 @@ void pars::respons_400()
     response_buf[response_str.size()] = '\0';
     response_buf1 = response_buf;
 }
-void pars::respons_403()
+void Response::respons_403()
 {
     std::ostringstream response;
     response << "HTTP/1.1 403 Forbidden\r\n";
@@ -55,7 +55,7 @@ void pars::respons_403()
     response_buf[response_str.size()] = '\0';
     response_buf1 = response_buf;
 }
-void pars::respons_405()
+void Response::respons_405()
 {
     std::ostringstream response;
     response << "HTTP/1.1 405 Method Not Allowed\r\n";
@@ -71,7 +71,7 @@ void pars::respons_405()
     response_buf1 = response_buf;
 }
 
-void pars::respons_413()
+void Response::respons_413()
 {
     std::ostringstream response;
     response << "HTTP/1.1 413 Request Entity Too Large\r\n";
@@ -85,7 +85,7 @@ void pars::respons_413()
     response_buf[response_str.size()] = '\0';
     response_buf1 = response_buf;
 }
-void pars::respons_500()
+void Response::respons_500()
 {
     std::ostringstream response;
     response << "HTTP/1.1 500 Internal Server Error\r\n";
@@ -99,7 +99,7 @@ void pars::respons_500()
     response_buf[response_str.size()] = '\0';
     response_buf1 = response_buf;
 }
-void pars::respons_504()
+void Response::respons_504()
 {
     std::ostringstream response;
     response << "HTTP/1.1 504 Gateway Timeout\r\n";
