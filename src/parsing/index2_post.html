@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Simple POST request example</title>
+  </head>
+  <body>
+    <form id="myForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name"><br><br>
+      <label for="nickname">Nickname:</label>
+      <input type="text" id="nickname" name="nickname"><br><br>
+      <input type="submit" value="Submit">
+    </form>
+    <script>
+      document.getElementById('myForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevents the form from submitting normally
+
+        // Send a POST request to the server
+        const formData = new FormData(this);
+        fetch('/submit', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      });
+    </script>
+  </body>
+</html>

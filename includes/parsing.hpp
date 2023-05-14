@@ -1,88 +1,99 @@
-#ifndef PARSING_HPP
+# ifndef PARSING_HPP
 #define PARSING_HPP
-
-#include "Request.hpp"
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>          
-#include <cstring>
-#include <algorithm>
-#include <signal.h>
-
-#include <cstdlib>
-#include <netinet/in.h>
-
-class loc
+#include "Utils.hpp"
+class Location
 {
-    public:
-    std::string path;//yes
-    std::string autoindex;//yes
-    std::string s_return;
-    std::string alias;
-    std::string allow_methods;//yes
-    std::string root;//yes
-    std::string index;//yes
+    private :
+		std::string 				_locationPath;//done
+    	std::string 				_root;//done
+		std::string 				_cgiPath;//done
+    	std::string 				_autoindex;//done
+    	std::string 				_index;//done
+		std::string					_upload;//done
+		std::string 				_redirect;//done
+    	std::vector<std::string> 	_allowMethods;//done
+	public :
+		Location(void);
+		Location(const Location& other);
+		Location& operator=(const Location& other);
+		~Location();
+		/*
+			============================================================
+		*/
+		std::string getLocationPath() const;
+		void setLocationPath(const std::string& locationPath);
+		std::string getRoot() const;
+		void setRoot(const std::string& root);
+		std::string getCgiPath() const;
+		void setCgiPath(const std::string& cgiPath);
+		std::string getAutoindex() const;
+		void setAutoindex(const std::string& autoindex);
+		std::string getIndex() const;
+		void setIndex(const std::string& index);
+		std::vector<std::string> getAllowMethods() const;
+		void setAllowMethods(const std::vector<std::string>& allowMethods);
+		std::string getUpload() const;
+		void setUpload(const std::string& upload);
+		std::string getRedirect() const;
+		void setRedirect(const std::string& redirect);
+		/*
+			============================= m func ===============================
+		*/
+		void readLocation(std::ifstream &file,std::string value, std::string check, std::string line);
 };
 
-class data
+class Config
 {
-    public:
-    std::string server_name;
-    std::string listen;
-    std::vector<std::string> error_page;
-    std::string body_size;
-    std::string root;
-    std::string index;
-    std::string allow_methods;
-    std::vector<std::string> methods;
-    std::vector<loc> location;
+	private :
+		std::vector<std::string> 		_serverName; // to be changed to vector<string>  (multiple server name)
+		std::string						_host;
+		std::string						_listen;
+		std::string 					_root;
+		std::map<int,std::string> 		_errorPages;
+		std::string						_clientMaxBodySize;
+		std::string						_clientBodyTempPath;
+		std::vector<Location>			_locations;
+		std::map<int,std::string> 		_redirect;
+		std::string						_index;
+	public :
+		/*
+			===============================================================
+		*/
+		Config(void);
+		Config(const Config &copy);
+		Config& operator= (const Config& obj);
+		~Config(void);
+		/*
+			===============================================================
+		*/
+		void setErrorPage(int code, const std::string& value);
+		std::map<int,std::string> getErrorPage(void);
+		void setServerName(const std::vector<std::string>& serverName);
+		std::vector<std::string> getServerName(void);
+		void setHost(std::string host);
+		std::string getHost(void) const;
+		std::string getListen(void) const;
+		void setListen(std::string listen);
+		std::string getRoot(void) const;
+		void setRoot(std::string root);
+		std::string getClientMaxBodySize(void) const;
+		void setClientMaxBodySize(std::string clientsize);
+		std::string getClientBodyTempPath(void) const;
+		void setClientBodyTempPath(std::string clientbody);
+		void setRedirect(int code, const std::string& value);
+		std::map<int, std::string> getRedirect() const;
+		void setIndex(const std::string& index);
+		void setLocations(const std::vector<Location>& locations);
+		const std::vector<Location>& getLocations() const;
+		std::string getIndex() const;
+		/*
+			===============================================================
+		*/
+		void check_config(std::ifstream &file, std::string line);
+		void check_servers(char *inputfile, std::vector<Config>& servers);
+
 };
-
-class pars
-{
-    public:
-    std::string f_data;
-    std::ifstream inputfile;
-    std::vector<data> s_data;
-    
-    pars(const pars& other)
-        : f_data(other.f_data),
-          s_data(other.s_data)
-    {
-    }
-    pars& operator=(const pars& other)
-    {
-        if (this == &other)
-            return *this;
-
-        f_data = other.f_data;
-        s_data = other.s_data;
-
-        return *this;
-    }
-    pars(){}
-    pars(char *str);
-    void check_data();
-    size_t location(size_t n,data &server);
-    size_t which_one(size_t n,data &server);
-    void reading_file();
-    size_t server_name(std::string &src,size_t n,std::string &str);
-    size_t listen(std::string &src,size_t n,std::string &str);
-    size_t root(std::string &src,size_t n,std::string &str);
-    size_t index(std::string &src,size_t n,std::string &str);
-    size_t body_size(std::string &src,size_t n,std::string &str);
-    size_t error_page(std::string &src,size_t n,data &server);
-    size_t allow_methods(std::string &src,size_t n,std::string &str);
-    size_t check_between(size_t start,size_t end);
-    size_t check_server_data(size_t n);
-    size_t which_one1(size_t n,std::string data,loc &location);
-    size_t s_return(std::string &src,size_t n,std::string &str);
-    size_t alias(std::string &src,size_t n,std::string &str);
-    size_t autoindex(std::string &src,size_t n,std::string &str);
-    void check_syntax(size_t i);
-};  
-size_t whitespaces(std::string str,size_t n);
-size_t fill_data(std::string str,std::string dest,size_t n , std::string &data);
+std::string removeLeadingWhitespace(std::string input);
+bool isDuplicateServer(std::vector<Config>& servers);
+std::vector<Config> Servers(char *file);
 #endif

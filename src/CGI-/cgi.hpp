@@ -7,7 +7,6 @@
 
 class Cgi {
     private:
-		Cgi(void);
 		void								_initEnv(Request &request, config &config);
 		char								**_getEnvAsCstrArray() const;
 		int									_getSocket(unsigned int port);
@@ -15,7 +14,7 @@ class Cgi {
 		std::map<std::string, std::string>	_env;
 		std::string							_body;
 	public:
-        
+        Cgi(void);
 		Cgi(Request &request, config &config);
 		Cgi(Cgi const &src);
 		virtual ~Cgi(void);

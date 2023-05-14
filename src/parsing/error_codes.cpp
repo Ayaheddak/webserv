@@ -61,7 +61,7 @@ void Response::respons_405()
     response << "HTTP/1.1 405 Method Not Allowed\r\n";
     response << "Content-Type: text/plain\r\n";
     response << "Content-Length: " << 17 << "\r\n";
-    response << "Allow:" <<s_data[0].allow_methods<<"\r\n";
+    response << "Allow:\r\n";
     response << "\r\n";
     response<<"Method Not Allowed\r\n";
     std::string response_str = response.str();

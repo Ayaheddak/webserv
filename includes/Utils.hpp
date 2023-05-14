@@ -21,13 +21,11 @@
 #include<netinet/in.h>  
 #include <fstream>
 #include <sstream>
-#include <sys/types.h>
-#include <sys/socket.h>
 
 #define PORT                8080
 #define TRUE                1
 #define FALSE               0
-#define RECV_SIZE           30000
-#define SEND_SIZE           30000
+#define RECV_SIZE           3000
+#define SEND_SIZE           3000
 
 #endif

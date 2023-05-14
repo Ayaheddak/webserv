@@ -10,10 +10,9 @@ class Response
     long glen;
     long length;
     char response_buf2[6000];
+    std::string remaining;
     char *response_buf1;
     long len;
-    pars    parsing;
-    std::vector<data> s_data;
     Request r_data;
     int c;
     int count;
@@ -40,7 +39,6 @@ class Response
 
             std::memcpy(response_buf2, other.response_buf2, sizeof(response_buf2));
 
-            s_data = other.s_data;
                        c = other.c;
             count = other.count;
 
@@ -48,10 +46,9 @@ class Response
         return *this;
     }
     Response(){}
-    void respons(int client_sock,pars parsing);
+    void respons(int client_sock,std::vector<Config>& parsing);
     void respons_200(std::string index);
-    void res_location(std::vector<loc>::iterator it);
-    void check_location(pars parsing);
+    void check_location(std::vector<Config>& parsing);
     void respons_404(void);
     void respons_201(std::string index);
     void respons_204(void);

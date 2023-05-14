@@ -1,15 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/10 16:54:32 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/14 13:02:03 by aheddak          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
+#include "../../includes/Server.hpp"
 #include "../../includes/parsing.hpp"
 #include <limits>
 Server::Server()
@@ -22,7 +11,7 @@ Server::Server(std::list<std::pair<std::string, std::string> > infoconfig)
 		_infoconfig.push_back(*it);
 }
 
-int Server::createSocket(std::string port, std::string ip)
+int Server::createSocket(std::string port, std::string ip) // function to create a socket
 {
 	int option;
 	int serverFd;
@@ -38,7 +27,6 @@ int Server::createSocket(std::string port, std::string ip)
 	setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 	if (bind(serverFd, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
 		throw BindException();
-	setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 	fcntl(serverFd, F_SETFL, O_NONBLOCK);
 	if (listen(serverFd, 80) < 0)
 		throw ListenException();
@@ -86,7 +74,7 @@ void Server::removeClient(int i, std::map<int, std::string> &client)
 	close (i);
 }
 
-void Server::start(pars &parsing)
+void Server::start(std::vector<Config> &parsing)
 {
 	int maxFds;
 	fd_set writeFds;
@@ -111,7 +99,7 @@ void Server::start(pars &parsing)
 		}
 	while (true)
 	{
-		std::cout << " +++++++ Waiting for new connection ++++++++ fd = " << maxFds << std::endl;
+		//std::cout << "+++++++ Waiting for new connection ++++++++ fd = " << maxFds << std::endl;
 
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
@@ -157,8 +145,6 @@ void Server::start(pars &parsing)
    					}
 					char buffer[RECV_SIZE] = {0};
 					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
-					std::cout << "buffer -> " << buffer << std::endl;
-					std::cout << " ################################# " << std::endl;
 					if (rec < 0)
 					{
 						FD_CLR(i, &backupRead);
@@ -166,12 +152,11 @@ void Server::start(pars &parsing)
 						isClient(i)	&& close(i);
 					}
 					it->res_data.r_data.request_append(buffer,rec);
-					if (it->res_data.r_data.getread() == true ||( it->res_data.r_data.getk() == -1 && rec == 0))
+					if (it->res_data.r_data.getread() == true ||( it->res_data.r_data.getk() == 2 && rec == 0))
 					{
-						// std::cout << "hello im here in cond " << std::endl;
+						std::cout << "hello im here in cond " << std::endl;
 						FD_CLR(i, &backupRead); 
 						FD_SET(i, &backupWrite);
-						break ;
 					}
 				}
 				else if (FD_ISSET(i, &writeFds))
@@ -182,13 +167,13 @@ void Server::start(pars &parsing)
    					    if(it->_clientFd == i)
 							break;
    					}
+					std::cout << "im here in response " << std::endl;
 					it->res_data.respons(i,parsing);
 					if(it->res_data.c <= 0)
 					{
 						it->res_data.r_data.clear();
 						isClient(i) && close (i);
 						FD_CLR(i, &backupWrite);
-						break ;
 					}
 				}
 			}

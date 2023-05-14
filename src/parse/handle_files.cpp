@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.hpp"
-
+#include "../../includes/parsing.hpp"
 bool isDuplicateServer(std::vector<Config>& servers)
 {
     for (std::vector<Config>::iterator it1 = servers.begin(); it1 != servers.end(); ++it1)
