@@ -1,6 +1,7 @@
 # ifndef PARSING_HPP
 #define PARSING_HPP
 #include "../../includes/Utils.hpp"
+#include "../../includes/Server.hpp"
 class Location
 {
     private :

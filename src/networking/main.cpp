@@ -6,12 +6,13 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:54:44 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/10 16:54:46 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/14 13:28:07 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.hpp"
 #include "../../includes/Server.hpp"
+#include "../parse/parsing.hpp"
 void check_arguments(int argc)
 {
     if(argc > 2)
@@ -22,13 +23,15 @@ void check_arguments(int argc)
 }
 int main(int argc,char **argv) 
 {
-    std::list<std::pair<std::string, std::string> > _port;
     check_arguments(argc);
-    pars parsing(argv[1]);
-    std::vector<data>::iterator it;
-    for (it = parsing.s_data.begin(); it != parsing.s_data.end(); it++)
+    std::list<std::pair<std::string, std::string> > _port;
+	std::vector<Config> servers;
+	servers = Servers(avgv[1]);
+    for (std::vector<Config> it = servers.begin(); it != servers.end(); it++)
     {
-        _port.push_back(std::make_pair(it->listen, "127.0.0.1"));
+        _port.push_back(it->getListen(), it->getHost());
+		std::cout << it->getHost() << std::endl;
+		std::cout << it->getListen() << std::endl;
     }
     Server server(_port);
     server.start(parsing);
