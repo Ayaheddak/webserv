@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		"__config": "cpp",
+		"__nullptr": "cpp",
+		"cstddef": "cpp",
+		"limits": "cpp",
+		"type_traits": "cpp",
+		"vector": "cpp",
+		"ostream": "cpp"
+	}
+}

@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:54:32 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/10 16:54:38 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/14 13:02:03 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,6 @@ void Server::start(pars &parsing)
    					    if(it->_clientFd == i)
 							break;
    					}
-					// std::cout << "im here in response " << std::endl;
 					it->res_data.respons(i,parsing);
 					if(it->res_data.c <= 0)
 					{

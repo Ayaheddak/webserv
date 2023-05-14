@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/10 16:55:47 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/14 12:58:24 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 	std::ifstream infile(inputfile);
 	std::string		line;
 	std::string		str;
-	// Config			server;
 
 	if (!infile.is_open())
 	{
@@ -49,11 +48,6 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 					std::cerr << "Error : waa khsnaa host,servername and listen ... " << std::endl;
 					exit(0);
 				}
-				if (isDuplicateServer(servers,server) == true )
-        		{
-        		    std::cerr << "Error: duplicate server" << std::endl;
-        		    exit(0);
-        		}
 				servers.push_back(server);
 			}
 		}

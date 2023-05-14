@@ -94,5 +94,6 @@ class Config
 
 };
 std::string removeLeadingWhitespace(std::string input);
-bool isDuplicateServer(std::vector<Config>& servers, Config server);
+bool isDuplicateServer(std::vector<Config>& servers);
+std::vector<Config> Servers(char *file);
 #endif
