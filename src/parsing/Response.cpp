@@ -75,6 +75,27 @@ std::string get_f_type(std::string str)
 
 void Response::check_location(std::vector<Config> &parsing)
 {
+    int c = 0;
+    if(r_data.getPath() != "")
+    {
+        std::cout <<"adadada"<< std::endl;
+         std::vector<Location>::iterator it;
+        for (it = parsing[0].getLocations().begin(); it != parsing[0].getLocations().end(); it++)
+        {
+            if(it->getLocationPath() == r_data.getPath() || r_data.getPath() == it->getRedirect())
+            {
+                c = 1;
+                break;
+            }
+        }
+        if(c == 0)
+        {
+            respons_404();
+            return;
+        }
+        respons_200(it->getIndex());
+        return;
+    }
     respons_200(parsing[0].getIndex());
 }
 void Response::respons_201(std::string index)
@@ -107,7 +128,7 @@ void Response::respons_204()
     response_buf1 = response_buf;
 
 }
-void Response::respons_301(,)
+void Response::respons_301()
 {
     std::ostringstream response;
 

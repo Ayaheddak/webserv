@@ -84,7 +84,7 @@ class Config
 		std::map<int, std::string> getRedirect() const;
 		void setIndex(const std::string& index);
 		void setLocations(const std::vector<Location>& locations);
-		const std::vector<Location>& getLocations() const;
+		std::vector<Location>& getLocations() ;
 		std::string getIndex() const;
 		/*
 			===============================================================

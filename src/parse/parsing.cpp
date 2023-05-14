@@ -134,7 +134,7 @@ std::vector<std::string> Config::getServerName(void)
     return (_serverName);
 }
 
-const std::vector<Location>& Config::getLocations() const 
+std::vector<Location>& Config::getLocations() 
 {
     return _locations;
 }
