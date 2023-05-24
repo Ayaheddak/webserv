@@ -23,7 +23,7 @@ class Request
     public :
         Request(){ status = false; k = 1; read = false; status_value = 0;}
         void  clear();
-        void request_append(const char *str,int length,size_t size,std::vector<Config>& parsing);
+        void request_append(const char *str,int length,size_t size,std::vector<Config>& parsing, std::pair<std::string, std::string> infoconfig);
         void parse_header(size_t size);
         void fill_header(size_t size);
         std::map<std::string, std::string> getheader() const;
@@ -38,8 +38,10 @@ class Request
         void handle_delete(Config &config,Location location);
         bool getread();
         int  getk();
-		// void matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig);
+		void matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig);
 		// std::vector<Config>::iterator findHostByPort(std::vector<Config>& hosts, std::pair<std::string, std::string> infoconfig);
 		// std::vector<Config>::iterator findHostByName(std::vector<Config>& conf, const std::string& search);
+		std::vector<Config>::iterator findMatchingConfig(std::vector<Config>& conf, const std::string& name, const std::pair<std::string, std::string>& infoconfig);
+		std::vector<Config>::iterator findMatchingConfigWithoutName(std::vector<Config>& conf, const std::pair<std::string, std::string>& infoconfig);
 };
 #endif

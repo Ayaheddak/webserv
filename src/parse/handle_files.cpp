@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/14 13:20:15 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/24 05:45:59 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ bool isDuplicateServer(std::vector<Config>& servers)
     {
         for (std::vector<Config>::iterator it2 = it1 + 1; it2 != servers.end(); ++it2)
         {
-            if (it1->getHost() == it2->getHost() && it1->getListen() == it2->getListen())
+            if (it1->getHost() == it2->getHost() && it1->getListen() == it2->getListen() && it1->getServerName() == it2->getServerName())
                 return true;
         }
     }

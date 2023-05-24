@@ -164,7 +164,7 @@ void Server::start(std::vector<Config> &parsing)
 						FD_CLR(i, &backupWrite);
 						removeClient(i);
 					}
-					it->res_data.r_data.request_append(buffer,rec,atol(parsing[0].getClientMaxBodySize().c_str()),parsing);
+					it->res_data.r_data.request_append(buffer,rec,atol(parsing[0].getClientMaxBodySize().c_str()),parsing, getIpPort(i));
 					if (it->res_data.r_data.getread() == true)
 					{
 						FD_CLR(i, &backupRead); 

@@ -201,7 +201,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
     int i;
     if(len > 0 || c == -3)
     {
-       char buff[1];
+       char buff[6000];
        if(remaining.size() > 0)
        {
             memcpy(buff,remaining.c_str(), len);

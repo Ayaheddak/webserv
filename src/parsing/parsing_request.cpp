@@ -61,7 +61,7 @@ void Request::pars_chunked_body(size_t size) {
 }
 
 
-void Request::request_append(const char *str,int length,size_t size,std::vector<Config>& parsing)
+void Request::request_append(const char *str,int length,size_t size,std::vector<Config>& parsing, std::pair<std::string, std::string> infoconfig)
 {
         if(k == -2 && length == 0)
         {
@@ -92,6 +92,7 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
                 read = true;
             }
             fill_header(size);
+			 matching(parsing, infoconfig);
             if(status_value == 0)
                 check_request(parsing);
             if(status_value != 201)
@@ -104,7 +105,7 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
         {
             body.write(str, length);
             len = len + length;
-            std::cout << len << std::endl;
+            // std::cout << len << std::endl;
         }
         if(len >= content_length && k < 0)
         {
@@ -157,7 +158,6 @@ void Request::parse_header(size_t size)
             }
             else
             {
-                status_value = 400;
                 read = true;
                 return;
                 // std::map<std::string, std::string>::iterator it = header.find("Connection");
@@ -244,39 +244,81 @@ void Request::clear()
     version = "";
 }
 
-
 // void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
 // {
-//     std::string search = header["Host"];
-//     size_t f = search.find(":");
-//     if (f != std::string::npos)
-//         search = search.substr(0, f);
-//     std::vector<Config>::iterator s = findHostByName(conf, search);
-//     if (s == conf.end())
-//         s = findHostByPort(conf, infoconfig);
-    
-//     if (s != conf.end())
-//         _host = *s;
+// 	std::string name = header["Host"];
+// 	size_t f = name.find(":");
+// 	if (f != std::string::npos)
+// 		name = name.substr(0, f);
+// 	std::vector<Config>::iterator s;
+// 	for (s = conf.begin(); s != conf.end(); s++)
+// 	{
+// 		if (s->getServerName() == name && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+// 		{
+// 			_host = *s;
+// 			break ;
+// 		}
+// 	}
+// 	if (s == conf.end())
+// 	{
+// 		for (s = conf.begin(); s != conf.end(); s++)
+// 		{
+// 			if (s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+// 			{
+// 				_host = *s;
+// 				break ;
+// 			}
+// 		}
+// 	}
+// 	s = conf.begin();
+// 	_host = *s;
 // }
+void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
+{
+	std::string search = header["Host"];
+	size_t f = search.find(":");
+	if (f != std::string::npos)
+		search = search.substr(0, f);
 
-// std::vector<Config>::iterator Request::findHostByName(std::vector<Config>& conf, const std::string& search)
-// {
-//     for (std::vector<Config>::iterator it = conf.begin(); it != conf.end(); ++it)
-//     {
-//         if (it->getServerName() == search)
-//             return it;
-//     }
-//     return conf.end();
-// }
+	std::vector<Config>::iterator s = findMatchingConfig(conf, search, infoconfig);
+	if (s == conf.end())
+	{
+		s = findMatchingConfigWithoutName(conf, infoconfig);
+	}
 
-// std::vector<Config>::iterator Request::findHostByPort(std::vector<Config>& hosts, std::pair<std::string, std::string> infoconfig)
-// {
-//     for (std::vector<Config>::iterator it = hosts.begin(); it != hosts.end(); ++it)
-//     {
-//         if (it->getListen() == infoconfig.first && it->getHost() == infoconfig.second)
-//         {
-//             return it;
-//         }
-//     }
-//     return hosts.end();
-// }
+	if (s != conf.end())
+	{
+		_host = *s;
+	}
+	else
+	{
+		s = conf.begin();
+		_host = *s;
+	}
+}
+
+std::vector<Config>::iterator Request::findMatchingConfig(std::vector<Config>& conf, const std::string& search, const std::pair<std::string, std::string>& infoconfig)
+{
+	std::vector<Config>::iterator s;
+	for (s = conf.begin(); s != conf.end(); s++)
+	{
+		if (s->getServerName() == name && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+		{
+			break;
+		}
+	}
+	return s;
+}
+
+std::vector<Config>::iterator Request::findMatchingConfigWithoutName(std::vector<Config>& conf, const std::pair<std::string, std::string>& infoconfig)
+{
+	std::vector<Config>::iterator s;
+	for (s = conf.begin(); s != conf.end(); s++)
+	{
+		if (s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+		{
+			break;
+		}
+	}
+	return s;
+}

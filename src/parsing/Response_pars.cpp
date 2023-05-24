@@ -40,7 +40,8 @@ void Request::handle_get(Config &config, Location location)
 
 void Request::check_request(std::vector<Config>& parsing)
 {
-    std::vector<Location> locations = parsing[0].getLocations();
+	(void)parsing;
+    std::vector<Location> locations = _host.getLocations();
     std::vector<Location>::iterator it;
 
     for (it = locations.begin(); it != locations.end(); ++it) {
@@ -51,13 +52,13 @@ void Request::check_request(std::vector<Config>& parsing)
 
     if(it == locations.end())
     {
-        std::string root = parsing[0].getRoot();
+        std::string root = _host.getRoot();
         std::string targetPath = root + getPath();
         struct stat sb;
 
         if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
-            std::string indexPath = targetPath +'/'+ parsing[0].getIndex();
+            std::string indexPath = targetPath +'/'+ _host.getIndex();
             // std::cout << indexPath << std::endl;
             if (access(indexPath.c_str(), F_OK) != -1) {
                 status_value = 200;
@@ -83,15 +84,15 @@ void Request::check_request(std::vector<Config>& parsing)
         return;
     if(getMethod() == "GET")
     {
-        handle_get(parsing[0],*it);
+        handle_get(_host,*it);
     }
     else if(getMethod() == "POST")
     {
-        handle_post(parsing[0],*it);
+        handle_post(_host,*it);
     }
     else if(getMethod() == "DELETE")
     {
-        handle_delete(parsing[0],*it);
+        handle_delete(_host,*it);
     }
     // std::cout << status_value << std::endl;
 }
