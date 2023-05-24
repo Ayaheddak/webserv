@@ -45,7 +45,7 @@ class Location
 class Config
 {
 	private :
-		std::vector<std::string> 		_serverName; // to be changed to vector<string>  (multiple server name)
+		std::string						_serverName; // to be changed to vector<string>  (multiple server name)
 		std::string						_host;
 		std::string						_listen;
 		std::string 					_root;
@@ -68,8 +68,8 @@ class Config
 		*/
 		void setErrorPage(int code, const std::string& value);
 		std::map<int,std::string> getErrorPage(void);
-		void setServerName(const std::vector<std::string>& serverName);
-		std::vector<std::string> getServerName(void);
+		void setServerName(std::string serverName);
+		std::string getServerName(void);
 		void setHost(std::string host);
 		std::string getHost(void) const;
 		std::string getListen(void) const;

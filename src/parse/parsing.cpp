@@ -119,7 +119,7 @@ void Config::setErrorPage(int code, const std::string& value)
     _errorPages[code] = value;
 }
 
-void Config::setServerName(const std::vector<std::string>& serverName)
+void Config::setServerName(std::string serverName)
 {
     _serverName = serverName;
 }
@@ -129,7 +129,7 @@ std::map<int,std::string> Config::getErrorPage(void)
     return (_errorPages);
 }
 
-std::vector<std::string> Config::getServerName(void)
+std::string Config::getServerName(void)
 {
     return (_serverName);
 }
@@ -177,16 +177,7 @@ void Config::check_config(std::ifstream &file, std::string line)
 			exit (0);
 		}
 		if (tmp == "server_name")
-		{
-			while (!value.empty()) 
-			{
-				if (value == "localhost")
-					value = "127.0.0.1";
-				_serverName.push_back(value);
-				value.clear();
-				iss >> value;
-			}
-		}
+			_serverName = value;
 		else if (tmp == "listen")
 			_listen = value;
 		else if (tmp == "host")

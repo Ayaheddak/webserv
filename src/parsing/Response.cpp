@@ -1,6 +1,9 @@
 #include "../../includes/Response.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
+#include <ftw.h>
+#include <iostream>
+#include <sys/stat.h>
 std::string get_f_type(std::string str)
 {
     std::string type = str.erase(0,str.find("."));
@@ -75,27 +78,6 @@ std::string get_f_type(std::string str)
 
 void Response::check_location(std::vector<Config> &parsing)
 {
-    int c = 0;
-    if(r_data.getPath() != "")
-    {
-        std::cout <<"adadada"<< std::endl;
-         std::vector<Location>::iterator it;
-        for (it = parsing[0].getLocations().begin(); it != parsing[0].getLocations().end(); it++)
-        {
-            if(it->getLocationPath() == r_data.getPath() || r_data.getPath() == it->getRedirect())
-            {
-                c = 1;
-                break;
-            }
-        }
-        if(c == 0)
-        {
-            respons_404();
-            return;
-        }
-        respons_200(it->getIndex());
-        return;
-    }
     respons_200(parsing[0].getIndex());
 }
 void Response::respons_201(std::string index)
@@ -105,10 +87,10 @@ void Response::respons_201(std::string index)
         response << "Content-Type: text/html\r\n";
         response << "Content-Length: 9\r\n";
         response << "\r\n";
+        response << "hahah";
         std::string str = response.str();
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
-        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
         len = strlen(response_buf2);
         c = -3;
 }
@@ -133,24 +115,32 @@ void Response::respons_301()
     std::ostringstream response;
 
     response << "HTTP/1.1 301 Moved Permanently\r\n";
-    response << "Location:  \r\n";
+    response << "Location: "<< r_data.fullpath <<"\r\n";
     response << "Content-Type: text/html; charset=UTF-8\r\n";
     response << "Content-Length: 0\r\n";
     response << "Connection: close\r\n";
     response << "\r\n";
-    std::string response_str = response.str();
-    char* response_buf = new char[response_str.size() + 1];
-    std::copy(response_str.begin(), response_str.end(), response_buf);
-    response_buf[response_str.size()] = '\0';
-    response_buf1 = response_buf;
+    std::string str = response.str();
+    str.copy(response_buf2, str.length());
+    response_buf2[str.length()] = '\0';
+    len = strlen(response_buf2);
 }
 void Response::respons_200(std::string index)
 {
     std::stringstream response;
     std::string line;
+    int i = 0;
+
     if(!html_file.is_open())
     {
         glen = 0;
+        if(index[i] == '.')
+        {
+            while(index[i] == '.' || index[i] == '/')
+                i++;
+        }
+        index = index.substr(i);
+
         html_file.open(index.c_str(), std::ios::in | std::ios::binary);
         html_file.seekg (0, html_file.end);
         length = html_file.tellg();
@@ -162,72 +152,66 @@ void Response::respons_200(std::string index)
         std::string str = response.str();
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
-        std::cout <<"++++"<<response_buf2 <<"----" <<std::endl;
         len = strlen(response_buf2);
     }
     else
     {
         html_file.read(response_buf2, 6000);
         len = html_file.gcount();
-        std::cout << len<< "---" << glen <<"----"<<length << std::endl;
     }
+}
+int Response::check_status()
+{
+    if(r_data.status_value == 301)
+        respons_301();
+    else if(r_data.status_value == 404)
+        respons_404();
+    else if(r_data.status_value == 400)
+        respons_400();
+    else if(r_data.status_value == 403)
+        respons_403();
+    else if(r_data.status_value == 405)
+        respons_405();
+    else if(r_data.status_value == 413)
+        respons_413();
+    else if(r_data.status_value == 500)
+        respons_500();
+    else if(r_data.status_value == 500)
+        respons_500();
+    else
+        return 0;
+    return 1;
 }
 void Response::respons(int client_sock,std::vector<Config> &parsing)
 {
-    //if(count == 0)
-    //    respons_405()
-    if(remaining.size() > 0)
-    {
-       int i;
-       i = send(client_sock, remaining.c_str() ,len, 0);
-       if(i == -1)
-       {
-            c = -4;
-       }
-       else if(i == 0)
-       {
-            close(i);
-       }
-        else
-        {
-            std::cout <<"hona"<< std::endl;
-            if(i < len)
-            {
-                remaining = std::string(response_buf2 + i, len -i);
-                std::cout << i << "----"<< len << "-----"<< glen<< std::endl;
-            }
-            remaining = "";
-            glen = i + glen;
-            c = 1;
-        }
-        if(length <= glen)
-        {
-            c = -1;
-            html_file.close();
-        }
-        return;
-    }
-    if(c != -4)
+    (void)parsing;
+    if(c != -4 && remaining.size() == 0)
     {
         len = 0;
         c = 1;
     }
-    std::cout << r_data.getPath() << std::endl;
-    if(r_data.getMethod() == "GET" && c != -4)
-        check_location(parsing);
+    if(check_status() == 1)
+        c = -1;
+    else if(r_data.getMethod() == "GET" && c != -4 && remaining.size() == 0)
+        respons_200(r_data.fullpath);
     else if(r_data.getMethod() == "POST")
     {
         respons_201("src/parsing/index1.html");
-        int l = send(client_sock, response_buf2 ,len, 0);
-        if(l < 0)
-            exit(1);
-        c = -1;
-        return;
     }
     int i;
     if(len > 0 || c == -3)
     {
-       i = send(client_sock, response_buf2 ,len, 0);
+       char buff[1];
+       if(remaining.size() > 0)
+       {
+            memcpy(buff,remaining.c_str(), len);
+            remaining = "";
+       }
+       else
+       {
+            memcpy(buff,response_buf2, len);
+       }
+       i = send(client_sock, buff ,len, 0);
        if(i == -1)
        {
             c = -4;
@@ -236,10 +220,8 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        {
            if(i < len)
            {
-               std::cout << "t" <<std::endl;
-               remaining = std::string(response_buf2 + i, len -i);
+               remaining = std::string(buff + i, len -i);
                len = len - i;
-               std::cout << i << "----"<< len << "-----"<< glen<< std::endl;
            }
            glen = i + glen;
            c = 1;

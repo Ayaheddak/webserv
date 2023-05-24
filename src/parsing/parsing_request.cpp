@@ -1,15 +1,33 @@
 #include "../../includes/parsing.hpp"
 #include "../../includes/Request.hpp"
 
-
-void Request::pars_chunked_body() {
+void Request::pars_chunked_body(size_t size) {
     size_t bodyStart = request.find("\r\n\r\n");
-    if (bodyStart == std::string::npos) {
+    if (bodyStart == std::string::npos)
+    {
         return;
     }
     bodyStart += 4;
-
     std::string data = request.substr(bodyStart);
+    if(size < data.size())
+    {
+        status_value = 413;
+        read = true;
+        return;
+    }
+    std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
+    if(ite != header.end())
+    {
+        std::string type = ite->second.substr(ite->second.find("/") + 1,ite->second.find(";") -1);
+        std::string name = fullpath+ "3ar.";
+        name += type;
+        body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
+        if(!body.is_open())
+        {
+            std::cerr << "Error: Could not open file" << std::endl;
+            exit(1);
+        }
+    }
     while (!data.empty()) {
         std::string chunkSizeStr;
         size_t i = 0;
@@ -43,9 +61,8 @@ void Request::pars_chunked_body() {
 }
 
 
-void Request::request_append(const char *str,int length)
+void Request::request_append(const char *str,int length,size_t size,std::vector<Config>& parsing)
 {
-        //std::cout << len <<"ss" << str << std::cout;
         if(k == -2 && length == 0)
         {
             read = true;
@@ -59,7 +76,7 @@ void Request::request_append(const char *str,int length)
         {
             if(request.find("0\r\n\r\n") != std::string::npos)
             {
-                pars_chunked_body();
+                pars_chunked_body(size);
                 return;
             }
         }
@@ -74,7 +91,14 @@ void Request::request_append(const char *str,int length)
             {
                 read = true;
             }
-            fill_header();
+            fill_header(size);
+            if(status_value == 0)
+                check_request(parsing);
+            if(status_value != 201)
+            {
+                read = true;
+                return;
+            }
         }
         else if(k < 0 && length > 0)
         {
@@ -87,7 +111,7 @@ void Request::request_append(const char *str,int length)
            read = true;
         }
 }
-void Request::parse_header()
+void Request::parse_header(size_t size)
 {
     std::istringstream header_stream(request);
     std::string line;
@@ -105,42 +129,41 @@ void Request::parse_header()
     }
     if(status == true)
     {
-        std::map<std::string, std::string> ::iterator it = header.find("Content-Length");
-        if(it != header.end())
-        {
-            content_length = std::atoi(header["Content-Length"].c_str());
-            k = -4;
-        }
-        else
-        {
-            std::map<std::string, std::string>::iterator it = header.find("Transfer-Encoding");
+        std::map<std::string, std::string>::iterator it = header.find("Transfer-Encoding");
             if(it != header.end())
             {
-                //std::cout << header["Transfer-Encoding"]<<" chunked^M"<< " chunked\r\n"<< std::endl;
                 if(header["Transfer-Encoding"] == " chunked\r")
-                {
                     k = 2;
+                else
+                {
+                    status_value = 501;
+                    read = true;
+                    return ;
+                }
+            }
+        else
+        {
+            std::map<std::string, std::string> ::iterator it = header.find("Content-Length");
+            if(it != header.end())
+            {
+                content_length = std::atoi(header["Content-Length"].c_str());
+                k = -4;
+                if(size < content_length)
+                {
+                    status_value = 413;
+                    read = true;
+                    return;
                 }
             }
             else
             {
-                std::map<std::string, std::string>::iterator it = header.find("Connection");
-                if(it != header.end())
-                    if(header["Connection"]== " close")
-                        k = -1;
-            }
-        }
-        std::map<std::string, std::string> ::iterator ite = header.find("Content-Type");
-        if(ite != header.end())
-        {
-            std::string type = ite->second.substr(ite->second.find("/") + 1,ite->second.find(";") -1);
-            std::string name = "3ar.";
-            name += type;
-            body.open(name, std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
-            if(!body.is_open())
-            {
-                std::cerr << "Error: Could not open file" << std::endl;
-                exit(1);
+                status_value = 400;
+                read = true;
+                return;
+                // std::map<std::string, std::string>::iterator it = header.find("Connection");
+                // if(it != header.end())
+                //     if(header["Connection"]== " close")
+                //         k = -1;
             }
         }
     }
@@ -155,16 +178,11 @@ void Request::parse_header()
     }
 }
 
-void Request::fill_header()
+void Request::fill_header(size_t size)
 {
     std::string data = request.substr(0,request.find("\r\n"));
 
     std::stringstream s(data);
-    // for(int i = 0;data[i];i++)
-    // {
-    //     if(data[i] == ' ')
-    //         count++;
-    // }
     if(data[data.find("/")+1] != ' ')
     {
         s >> method;
@@ -176,7 +194,19 @@ void Request::fill_header()
         s >> method;
         s >> version;
     }
-    parse_header();
+    if (path.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=") != std::string::npos)
+    {
+        status_value = 400;
+        read = true;
+        return ;
+    }
+    if(path.size() > 2048)
+    {
+        status_value = 414;
+        read = true;
+        return ;
+    }
+    parse_header(size);
 }
 std::string Request::getMethod() const
 {
@@ -212,5 +242,41 @@ void Request::clear()
     request = "";
     path = "";
     version = "";
-    
 }
+
+
+// void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
+// {
+//     std::string search = header["Host"];
+//     size_t f = search.find(":");
+//     if (f != std::string::npos)
+//         search = search.substr(0, f);
+//     std::vector<Config>::iterator s = findHostByName(conf, search);
+//     if (s == conf.end())
+//         s = findHostByPort(conf, infoconfig);
+    
+//     if (s != conf.end())
+//         _host = *s;
+// }
+
+// std::vector<Config>::iterator Request::findHostByName(std::vector<Config>& conf, const std::string& search)
+// {
+//     for (std::vector<Config>::iterator it = conf.begin(); it != conf.end(); ++it)
+//     {
+//         if (it->getServerName() == search)
+//             return it;
+//     }
+//     return conf.end();
+// }
+
+// std::vector<Config>::iterator Request::findHostByPort(std::vector<Config>& hosts, std::pair<std::string, std::string> infoconfig)
+// {
+//     for (std::vector<Config>::iterator it = hosts.begin(); it != hosts.end(); ++it)
+//     {
+//         if (it->getListen() == infoconfig.first && it->getHost() == infoconfig.second)
+//         {
+//             return it;
+//         }
+//     }
+//     return hosts.end();
+// }

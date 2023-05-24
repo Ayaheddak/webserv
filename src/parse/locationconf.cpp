@@ -27,7 +27,6 @@ Location& Location::operator=(const Location& other)
         _cgiPath = other._cgiPath;
         _autoindex = other._autoindex;
         _index = other._index;
-        _allowMethods = other._allowMethods;
         _upload = other._upload;
 		_redirect = other._redirect;
     }
@@ -126,6 +125,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 	std::string tmp;
 	std::string l1;
 	std::string cheeck;
+	_locationPath = value;
 	while (!file.eof())
 	{
 		str =  removeLeadingWhitespace(line);

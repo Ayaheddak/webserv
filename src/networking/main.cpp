@@ -15,8 +15,11 @@ int main(int argc,char **argv)
     std::vector<Config> servers;
     check_arguments(argc);
  	servers = Servers(argv[1]);
+	//loop through servers and create a list of ip and port
+	// for(size_t i = 0; i < servers.size(); i++)
+		// _port.push_back(std::make_pair(servers[i].getHost(), servers[i].getListen()));
     _port.push_back(std::make_pair(servers[0].getHost(), servers[0].getListen()));
-    Server server(_port);
+    Server server(_port, servers);
     server.start(servers);
     return 0;
 }

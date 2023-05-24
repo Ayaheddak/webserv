@@ -1,14 +1,15 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/parsing.hpp"
 #include <limits>
-Server::Server()
-{
-}
+// Server::Server()
+// {}
 
-Server::Server(std::list<std::pair<std::string, std::string> > infoconfig)
+Server::Server(std::list<std::pair<std::string, std::string> > infoconfig, std::vector<Config> conf)
 {
 	for (std::list<std::pair<std::string, std::string> >::iterator it = infoconfig.begin(); it != infoconfig.end(); it++)
 		_infoconfig.push_back(*it);
+	for (std::vector<Config>::iterator it = conf.begin(); it != conf.end(); it++)
+		_conf.push_back(*it);
 }
 
 int Server::createSocket(std::string port, std::string ip) // function to create a socket
@@ -55,23 +56,28 @@ bool Server::isListener(int fd)
 	return (FALSE);
 }
 
-bool Server::isClient(int fd)
+void Server::removeClient(int fd)
 {
-    for(std::list<Client>::iterator it =_clients.begin() ; it != _clients.end(); it++)
-    {
-        if (it->getClientFd() == fd)
-        {
-            _clients.erase(it);
-            return (TRUE);
-        }
-    }
-    return (FALSE);
+	std::list<Client>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->getClientFd() == fd)
+		{
+			_clients.erase(it);
+			break;
+		}
+	}
 }
 
-void Server::removeClient(int i, std::map<int, std::string> &client)
+std::pair<std::string, std::string> Server::getIpPort(int fd)
 {
-	client.erase(i);
-	close (i);
+	std::list<std::pair <std::pair<std::string, std::string>, int> >::iterator it;
+	for (it = _listners.begin(); it != _listners.end(); it++)
+	{
+		if (it->second == fd)
+			return (it->first);
+	}
+	return (std::pair<std::string, std::string>("", ""));
 }
 
 void Server::start(std::vector<Config> &parsing)
@@ -92,15 +98,14 @@ void Server::start(std::vector<Config> &parsing)
 		_listners.push_back(create(*it));
 	maxFds = std::numeric_limits<int>::min(); 
 	for (std::list<std::pair<std::pair<std::string, std::string>, int> >::iterator it = _listners.begin(); it != _listners.end(); it++)
-		{
-			FD_SET(it->second, &backupRead);
-			if (it->second > maxFds)
-				maxFds = it->second;
-		}
+	{
+		FD_SET(it->second, &backupRead);
+		if (it->second > maxFds)
+			maxFds = it->second;
+	}
 	while (true)
 	{
 		//std::cout << "+++++++ Waiting for new connection ++++++++ fd = " << maxFds << std::endl;
-
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		FD_ZERO(&readFds);
@@ -128,10 +133,17 @@ void Server::start(std::vector<Config> &parsing)
 						continue ;
 					}
 					fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the new socket to non-blocking mode
+					// if (clientSocket >= FD_SETSIZE)
+					// {
+					// 	std::cout << "Too many clients " << std::endl;
+					// 	close(clientSocket);
+					// 	continue ;
+					// }
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					Client c(clientSocket);
+					std::cout << "New connection "  << clientSocket << " from => " << getIpPort(i).first << " : " << getIpPort(i).second  << std::endl;
+					Client c(clientSocket, getIpPort(i));
 					_clients.push_back(c);
 					break ;
 				}
@@ -139,22 +151,22 @@ void Server::start(std::vector<Config> &parsing)
 				{
 					std::list<Client>::iterator it;
 					for (it = _clients.begin(); it != _clients.end(); ++it)
-   					{
-   					    if(it->_clientFd == i)
+					{
+					    if(it->_clientFd == i)
 							break;
-   					}
+					}
 					char buffer[RECV_SIZE] = {0};
 					int rec = recv(i, buffer, RECV_SIZE - 1, 0);
 					if (rec < 0)
 					{
+						close(i);
 						FD_CLR(i, &backupRead);
 						FD_CLR(i, &backupWrite);
-						isClient(i)	&& close(i);
+						removeClient(i);
 					}
-					it->res_data.r_data.request_append(buffer,rec);
-					if (it->res_data.r_data.getread() == true ||( it->res_data.r_data.getk() == 2 && rec == 0))
+					it->res_data.r_data.request_append(buffer,rec,atol(parsing[0].getClientMaxBodySize().c_str()),parsing);
+					if (it->res_data.r_data.getread() == true)
 					{
-						std::cout << "hello im here in cond " << std::endl;
 						FD_CLR(i, &backupRead); 
 						FD_SET(i, &backupWrite);
 					}
@@ -167,13 +179,13 @@ void Server::start(std::vector<Config> &parsing)
    					    if(it->_clientFd == i)
 							break;
    					}
-					std::cout << "im here in response " << std::endl;
 					it->res_data.respons(i,parsing);
 					if(it->res_data.c <= 0)
 					{
 						it->res_data.r_data.clear();
-						isClient(i) && close (i);
+						close(i);
 						FD_CLR(i, &backupWrite);
+						removeClient(i);
 					}
 				}
 			}
