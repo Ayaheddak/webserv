@@ -7,6 +7,7 @@ class Request
 {
     public:
         int                                 k;
+        std::string                         a_body;
         std::string                         request;
         std::string                         fullpath;
         std::string                         method;
@@ -42,5 +43,6 @@ class Request
 		std::vector<Config>::iterator findMatchingConfig(std::vector<Config>& conf, const std::string& name, const std::pair<std::string, std::string>& infoconfig);
 		std::vector<Config>::iterator findMatchingConfigWithoutName(std::vector<Config>& conf, const std::pair<std::string, std::string>& infoconfig);
 		Config getServer(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)const;
+        std::string handle_autoindex(const std::string& directoryPath);
 };
 #endif

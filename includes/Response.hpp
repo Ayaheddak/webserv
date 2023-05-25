@@ -72,6 +72,7 @@ class Response
     void respons_413(void);
     void respons_500(void);
     void respons_504(void);
+    void respons_ai(void);
 };  
 size_t whitespaces(std::string str,size_t n);
 size_t fill_data(std::string str,std::string dest,size_t n , std::string &data);

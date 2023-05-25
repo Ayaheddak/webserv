@@ -87,7 +87,6 @@ void Response::respons_201(std::string index)
         response << "Content-Type: text/html\r\n";
         response << "Content-Length: 9\r\n";
         response << "\r\n";
-        response << "hahah";
         std::string str = response.str();
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
@@ -124,6 +123,20 @@ void Response::respons_301()
     str.copy(response_buf2, str.length());
     response_buf2[str.length()] = '\0';
     len = strlen(response_buf2);
+}
+void Response::respons_ai()
+{
+    std::stringstream response;
+    length = r_data.a_body.length();
+        response << "HTTP/1.1 200 OK\r\n";
+        response << "Content-Type: text/html\r\n";
+        response << "Content-Length: " << length << "\r\n";
+        response << "\r\n";
+        response << r_data.a_body;
+        std::string str = response.str();
+        str.copy(response_buf2,str.length());
+        response_buf2[str.length()] = '\0';
+        len = strlen(response_buf2);
 }
 void Response::respons_200(std::string index)
 {
@@ -178,6 +191,8 @@ int Response::check_status()
         respons_500();
     else if(r_data.status_value == 500)
         respons_500();
+    else if(r_data.status_value == 1)
+        respons_ai();
     else
         return 0;
     return 1;
@@ -211,7 +226,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        {
             memcpy(buff,response_buf2, len);
        }
-       i = send(client_sock, buff ,len, 0);
+       i = send(client_sock, buff ,len, MSG_NOSIGNAL);
        if(i == -1)
        {
             c = -4;

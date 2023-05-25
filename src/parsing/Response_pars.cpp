@@ -5,22 +5,62 @@
 #include <iostream>
 #include <sys/stat.h>
 
+#include <dirent.h>
+#include <unistd.h>
+
+std::string Request::handle_autoindex(const std::string& directoryPath) {
+    DIR *dir;
+    struct dirent *entry;
+    std::string html = "<html>\n<head><title>Index of " + directoryPath + "</title></head>\n<body>\n<h1>Index of " + directoryPath + "</h1>\n<hr>\n<pre>\n";
+
+    dir = opendir(directoryPath.c_str());
+    if (!dir) {
+        status_value = 500;
+        return "";
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        std::string name = entry->d_name;
+
+        // Ignore the "." and ".." directories
+        if (name == "." || name == "..")
+            continue;
+
+        html += "<a href=\"" + name + "\">" + name + "</a>\n";
+    }
+
+    closedir(dir);
+
+    html += "</pre>\n<hr>\n</body>\n</html>\n";
+    return html;
+}
+
 void Request::handle_get(Config &config, Location location)
 {
     (void) config;
     struct stat sb;
 
-    std::string targetPath = location.getRoot() + getPath().substr(location.getLocationPath().size());
-
+    size_t size;
+    if(location.getLocationPath() == "/")
+        size = 0;
+    else
+        size = location.getLocationPath().size();
+    std::string targetPath = location.getRoot() + getPath().substr(size);
+    std::cout << targetPath <<std::endl;
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/') {
+            if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
                 status_value = 301;
                 fullpath = getPath() + '/';
                 return;
             }
             else if (location.getAutoindex() == "on")
+            {
                 fullpath = targetPath;  // For auto-indexing
+                a_body = handle_autoindex(targetPath);
+                status_value = 1;  // For auto-indexing
+                return;
+            }
             else {
                 fullpath = targetPath + "/" + location.getIndex();
                 if (access(fullpath.c_str(), F_OK) == -1)
@@ -47,43 +87,32 @@ void Request::check_request(std::vector<Config>& parsing)
     for (it = locations.begin(); it != locations.end(); ++it) {
         Location location = *it;
         if (getPath().find(location.getLocationPath()) != std::string::npos)
+        {
+            /*if(it->getRedirect().find("301"))
+            {
+                fullpath = "gag";
+                status_value = 301;
+                return;
+            }*/
             break;
+        }
     }
-
     if(it == locations.end())
     {
-        std::string root = _host.getRoot();
-        std::string targetPath = root + getPath();
-        struct stat sb;
-
-        if (stat(targetPath.c_str(), &sb) == 0) {
-        if (S_ISDIR(sb.st_mode)) {
-            std::string indexPath = targetPath +'/'+ _host.getIndex();
-            // std::cout << indexPath << std::endl;
-            if (access(indexPath.c_str(), F_OK) != -1) {
-                status_value = 200;
-                fullpath = indexPath;
-                // std::cout << targetPath << std::endl;
-            } else {
-                status_value = 404;
-            }
-        } else {
-            if (access(targetPath.c_str(), F_OK) != -1) {
-                status_value = 200;
-                fullpath = targetPath;
-                // << fullpath << std::endl;
-            } else {
-                status_value = 404;
-            }
+        if(locations[0].getLocationPath()== "/")
+        {
+            it = locations.begin();
+            std::cout << it->getLocationPath()<< std::endl;
         }
-        } else {
+        else
             status_value = 404;
-        }
     }
+    std::cout << status_value<< std::endl;
     if(status_value > 0)
         return;
     if(getMethod() == "GET")
     {
+        
         handle_get(_host,*it);
     }
     else if(getMethod() == "POST")
@@ -92,6 +121,7 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     else if(getMethod() == "DELETE")
     {
+
         handle_delete(_host,*it);
     }
     // std::cout << status_value << std::endl;
@@ -135,44 +165,28 @@ void Request::handle_delete(Config &config,Location location)
     (void) config;
     (void) location;
     struct stat sb;
-    std::string targetPath;
-
-    if(fullpath.empty())
-        targetPath = location.getRoot() + getPath().substr(location.getLocationPath().size());
-
+    
+   size_t size;
+    if(location.getLocationPath() == "/")
+        size = 0;
     else
-        targetPath = fullpath;
+        size = location.getLocationPath().size();
+    std::string targetPath = location.getRoot() + getPath().substr(size);
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/') {
+            if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
                 status_value = 409;
                 return;
-            }
-            if(!location.getCgiPath().empty())
-            {
-                if(location.getIndex().empty())
-                {
-                    status_value = 409;
-                    return;
-                }
-                // cgi code
             }
             else {
                 status_value = delete_directory_recursive(targetPath.c_str());
             }
         } else {
             fullpath = targetPath;
-             if(!location.getCgiPath().empty())
-             {
-                // cgi code
-             }
-             else
-             {
                  if (remove(targetPath.c_str()) == 0)
                     status_value =  204;
                 else
-                    status_value =  403;     
-             }
+                    status_value =  403;
         }
     } else {
         status_value = 404;
@@ -189,10 +203,15 @@ void Request::handle_post(Config &config,Location location)
         fullpath = location.getUpload() + '/';
         return;
     }
-
+    
     struct stat sb;
 
-    std::string targetPath = location.getRoot() + getPath().substr(location.getLocationPath().size());
+    size_t size;
+    if(location.getLocationPath() == "/")
+        size = 0;
+    else
+        size = location.getLocationPath().size();
+    std::string targetPath = location.getRoot() + getPath().substr(size);
 
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
