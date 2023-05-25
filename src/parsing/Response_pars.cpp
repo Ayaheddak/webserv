@@ -1,6 +1,7 @@
 #include "../../includes/Response.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
+#include "../CGI-/cgi.hpp"
 #include <ftw.h>
 #include <iostream>
 #include <sys/stat.h>
@@ -40,10 +41,8 @@ void Request::handle_get(Config &config, Location location)
     (void) config;
     struct stat sb;
 
-    size_t size;
-    if(location.getLocationPath() == "/")
-        size = 0;
-    else
+    size_t size = 0;
+    if(location.getLocationPath() != "/")
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
     std::cout << targetPath <<std::endl;
@@ -83,11 +82,11 @@ void Request::check_request(std::vector<Config>& parsing)
 	(void)parsing;
     std::vector<Location> locations = _host.getLocations();
     std::vector<Location>::iterator it;
-
     for (it = locations.begin(); it != locations.end(); ++it) {
         Location location = *it;
-        if (getPath().find(location.getLocationPath()) != std::string::npos)
+        if (getPath().find(location.getLocationPath()) == 0 && location.getLocationPath() != "/")
         {
+            std::cout << it->getLocationPath() << std::endl;
             /*if(it->getRedirect().find("301"))
             {
                 fullpath = "gag";
@@ -102,17 +101,14 @@ void Request::check_request(std::vector<Config>& parsing)
         if(locations[0].getLocationPath()== "/")
         {
             it = locations.begin();
-            std::cout << it->getLocationPath()<< std::endl;
         }
         else
             status_value = 404;
     }
-    std::cout << status_value<< std::endl;
     if(status_value > 0)
         return;
     if(getMethod() == "GET")
     {
-        
         handle_get(_host,*it);
     }
     else if(getMethod() == "POST")
@@ -121,7 +117,6 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     else if(getMethod() == "DELETE")
     {
-
         handle_delete(_host,*it);
     }
     // std::cout << status_value << std::endl;
@@ -146,18 +141,11 @@ int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct F
 int delete_directory_recursive(const std::string& directoryPath)
 {
     int flags = FTW_DEPTH | FTW_PHYS;
-
     int result = nftw(directoryPath.c_str(), delete_file, 20, flags);
     if (result == -1) {
         return 500;
     }
-
-    // Delete the directory itself
-    if (rmdir(directoryPath.c_str()) == 0) {
-        return 204;
-    } else {
-        return 500;
-    }
+    return 204;
 }
 
 void Request::handle_delete(Config &config,Location location)
@@ -165,13 +153,19 @@ void Request::handle_delete(Config &config,Location location)
     (void) config;
     (void) location;
     struct stat sb;
-    
-   size_t size;
+
+    size_t size;
     if(location.getLocationPath() == "/")
         size = 0;
     else
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
+
+if (access(targetPath.c_str(), R_OK) != 0 || access(targetPath.c_str(), W_OK) != 0) {
+            std::cout << "Access denied to " << targetPath << std::endl;
+            status_value = 403;
+            return;
+        }
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
             if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
@@ -180,23 +174,27 @@ void Request::handle_delete(Config &config,Location location)
             }
             else {
                 status_value = delete_directory_recursive(targetPath.c_str());
+                std::cout << status_value << std::endl;
             }
         } else {
             fullpath = targetPath;
-                 if (remove(targetPath.c_str()) == 0)
-                    status_value =  204;
-                else
-                    status_value =  403;
+            if (remove(targetPath.c_str()) == 0)
+                status_value =  204;
+            else
+                status_value =  403;
         }
     } else {
         status_value = 404;
     }
 }
-void Request::handle_post(Config &config,Location location)
+
+
+void Request::handle_post(Config &config,Location location) // need request hna
 {
     (void) config;
     (void) location;
 
+    // Cgi Cgi(request,config,location);
     if(!location.getUpload().empty()) // la kan fih upload sf rah good  201
     {
         status_value = 201;
@@ -222,14 +220,15 @@ void Request::handle_post(Config &config,Location location)
             }
             else {
                 fullpath = targetPath + "/" + location.getIndex();
-                if (access(fullpath.c_str(), F_OK) == -1)
-                    status_value = 403;  // No index file and autoindex is off
+                if (access(fullpath.c_str(), R_OK) == -1)
+                    status_value = 403;
                 else
                 {
                     if(location.getCgiPath().empty())
                         status_value = 403;
                     else
-                         status_value = 201; // Cgi location
+                         status_value = 201; // hna fin dir cgi blast had status
+                        //  Cgi.executeCgi(script);
                 }
             }
         } else {
@@ -237,7 +236,8 @@ void Request::handle_post(Config &config,Location location)
              if(location.getCgiPath().empty())
                 status_value = 403;
             else
-                 status_value = 201;
+                 status_value = 201; // hna fin dir cgi blast had status
+                //   Cgi.executeCgi(script);
         }
     } else {
         status_value = 404;
