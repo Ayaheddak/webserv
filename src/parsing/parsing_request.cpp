@@ -302,7 +302,7 @@ std::vector<Config>::iterator Request::findMatchingConfig(std::vector<Config>& c
 	std::vector<Config>::iterator s;
 	for (s = conf.begin(); s != conf.end(); s++)
 	{
-		if (s->getServerName() == name && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+		if (s->getServerName() == search && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
 		{
 			break;
 		}

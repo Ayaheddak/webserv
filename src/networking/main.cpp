@@ -11,6 +11,7 @@ void check_arguments(int argc)
 
 int main(int argc,char **argv) 
 {
+	try {
     std::list<std::pair<std::string, std::string> > _port;
     std::vector<Config> servers;
     check_arguments(argc);
@@ -21,5 +22,10 @@ int main(int argc,char **argv)
     // _port.push_back(std::make_pair(servers[0].getHost(), servers[0].getListen()));
     Server server(_port, servers);
     server.start(servers);
+	}
+	catch (std::exception &e) 
+	{
+		std::cerr << e.what() << std::endl;
+	}
     return 0;
 }
