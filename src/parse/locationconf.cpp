@@ -173,6 +173,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 				l1.clear();
 				iss >> l1;
 			}
+
 		}
 		else if (tmp == "upload")
 			_upload = l1;
@@ -184,6 +185,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		getline(file, line);
 		l1.clear();
+
 	}
 }
 

@@ -11,9 +11,7 @@ void Request::pars_chunked_body(size_t size) {
     std::string data = request.substr(bodyStart);
     if(size < data.size())
     {
-        status_value = 413;
-        read = true;
-        return;
+        size = 0;
     }
     std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
     if(ite != header.end())
