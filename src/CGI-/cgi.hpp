@@ -1,13 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cgi.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/25 16:29:18 by mrafik            #+#    #+#             */
+/*   Updated: 2023/05/25 16:29:19 by mrafik           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 #include<string>
 #include<iostream>
 #include<map>
 #include <fcntl.h>
 #include <unistd.h>
+#include"../../includes/Request.hpp"
+#include"../../includes/parsing.hpp"
 
 class Cgi {
     private:
-		void								_initEnv(Request &request, config &config);
+		void								_initEnv(Request &request, Config &config ,Location &location);
 		char								**_getEnvAsCstrArray() const;
 		int									_getSocket(unsigned int port);
 		int									_connectSocket(unsigned int port);
@@ -15,7 +29,7 @@ class Cgi {
 		std::string							_body;
 	public:
         Cgi(void);
-		Cgi(Request &request, config &config);
+		Cgi(Request &request, Config &config,Location &location);
 		Cgi(Cgi const &src);
 		virtual ~Cgi(void);
 
