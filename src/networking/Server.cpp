@@ -89,7 +89,7 @@ void Server::start(std::vector<Config> &parsing)
 	fd_set backupWrite;
 	struct timeval timeout;
 
-	//signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 	FD_ZERO(&backupRead);
 	FD_ZERO(&backupWrite);
 	FD_ZERO(&readFds);
