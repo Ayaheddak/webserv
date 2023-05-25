@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cgi.cpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/25 16:29:14 by mrafik            #+#    #+#             */
+/*   Updated: 2023/05/25 17:35:48 by mrafik           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include"cgi.hpp"
 
-Cgi::Cgi(Request &request, config &config)
+Cgi::Cgi(Request &request, Config &config,Location &location)
 {
-    _body = request.get_body;
-	this->_initEnv(request, config);
+    _body = request.getBody();
+	this->_initEnv(request, config,location);
 }
 
 Cgi::~Cgi(void) {
@@ -18,32 +30,32 @@ Cgi	&Cgi::operator=(Cgi const &src) {
 	return *this;
 }
 
-void		Cgi::_initEnv(Request &request, config &config) 
+void		Cgi::_initEnv(Request &request, Config &config, Location &location) 
 {
 
-	std::map<std::string, std::string>	headers = request.get_headers();
+	std::map<std::string, std::string>	headers = request.getheader();
 	if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
 		this->_env["AUTH_TYPE"] = headers["Authorization"];
 
 	this->_env["REDIRECT_STATUS"] = "200"; //ela qbl secruti to execute php-cgi
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_env["SCRIPT_NAME"] = config.get_path(); //path dyql cgi
-	this->_env["SCRIPT_FILENAME"] = config.get_path(); // same
+	this->_env["SCRIPT_NAME"] = location.getCgiPath(); //path dyql cgi
+	this->_env["SCRIPT_FILENAME"] = location.getCgiPath(); // same
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
 	this->_env["CONTENT_LENGTH"] = std :: to_string(this->_body.length()); // lenght dyql body
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
-	this->_env["PATH_INFO"] = request.get_path(); // path dyal request source
-	this->_env["PATH_TRANSLATED"] = request.get_path(); // same
+	this->_env["PATH_INFO"] = request.getPath(); // path dyal request source
+	this->_env["PATH_TRANSLATED"] = request.getPath(); // same
 	this->_env["QUERY_STRING"] = request.get_query();
-	this->_env["REMOTEaddr"] = std:: to_string(config.get_host_port().host); // ip dyal client
+	this->_env["REMOTEaddr"] = config.getHost(); // ip dyal client
 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
 	this->_env["REMOTE_USER"] = headers["Authorization"];
-	this->_env["REQUEST_URI"] = request.get_path() + request.get_query();
+	this->_env["REQUEST_URI"] = request.getPath() + request.get_query();
 	if (headers.find("Hostname") != headers.end())
 		this->_env["SERVER_NAME"] = headers["Hostname"];
 	else
 		this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	this->_env["SERVER_PORT"] = std:: to_string(config.get_host_port().port);
+	this->_env["SERVER_PORT"] = config.getListen();
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
