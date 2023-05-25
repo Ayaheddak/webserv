@@ -243,38 +243,30 @@ void Request::clear()
     path = "";
     version = "";
 }
-
-// void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
-// {
-// 	std::string name = header["Host"];
-// 	size_t f = name.find(":");
-// 	if (f != std::string::npos)
-// 		name = name.substr(0, f);
-// 	std::vector<Config>::iterator s;
-// 	for (s = conf.begin(); s != conf.end(); s++)
-// 	{
-// 		if (s->getServerName() == name && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
-// 		{
-// 			_host = *s;
-// 			break ;
-// 		}
-// 	}
-// 	if (s == conf.end())
-// 	{
-// 		for (s = conf.begin(); s != conf.end(); s++)
-// 		{
-// 			if (s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
-// 			{
-// 				_host = *s;
-// 				break ;
-// 			}
-// 		}
-// 	}
-// 	s = conf.begin();
-// 	_host = *s;
-// }
+Config Request::getServer(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)const
+{
+	// std::cout << "searching server" << std::endl;
+	// std::cout << "host: " << infoconfig.first << std::endl;
+	// std::cout << "listen: " << infoconfig.second << std::endl;
+	std::vector<Config>::iterator it;
+	for (it = conf.begin(); it != conf.end(); it++)
+	{
+		// std::cout << "host: " << it->getHost() << std::endl;
+		// std::cout << "listen: " << it->getListen() << std::endl;
+		if (it->getHost() == infoconfig.first && it->getListen() == infoconfig.second)
+		{
+			std::cout << "server found" << std::endl;
+			return *it;
+		}
+	}
+	return *it;
+	// std::cout << "server not found" << std::endl;
+	// exit(1);
+}
 void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
 {
+	// std::cout << "host in matching : " << infoconfig.first << std::endl;
+	// std::cout << "listen in matching : " << infoconfig.second << std::endl;
 	std::string search = header["Host"];
 	size_t f = search.find(":");
 	if (f != std::string::npos)
@@ -282,18 +274,14 @@ void Request::matching(std::vector<Config> conf, std::pair<std::string, std::str
 
 	std::vector<Config>::iterator s = findMatchingConfig(conf, search, infoconfig);
 	if (s == conf.end())
-	{
 		s = findMatchingConfigWithoutName(conf, infoconfig);
-	}
-
 	if (s != conf.end())
-	{
 		_host = *s;
-	}
 	else
 	{
-		s = conf.begin();
-		_host = *s;
+		std::cout << "no matching server" << std::endl;
+		_host = getServer(conf,infoconfig);
+		// exit(1);
 	}
 }
 

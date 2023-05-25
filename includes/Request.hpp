@@ -39,9 +39,8 @@ class Request
         bool getread();
         int  getk();
 		void matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig);
-		// std::vector<Config>::iterator findHostByPort(std::vector<Config>& hosts, std::pair<std::string, std::string> infoconfig);
-		// std::vector<Config>::iterator findHostByName(std::vector<Config>& conf, const std::string& search);
 		std::vector<Config>::iterator findMatchingConfig(std::vector<Config>& conf, const std::string& name, const std::pair<std::string, std::string>& infoconfig);
 		std::vector<Config>::iterator findMatchingConfigWithoutName(std::vector<Config>& conf, const std::pair<std::string, std::string>& infoconfig);
+		Config getServer(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)const;
 };
 #endif
