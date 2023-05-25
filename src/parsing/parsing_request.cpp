@@ -15,8 +15,10 @@ void Request::pars_chunked_body(size_t size) {
     }
     std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
     if(ite != header.end())
-    {
-        std::string type = ite->second.substr(ite->second.find("/") + 1,ite->second.find(";") -1);
+    {      
+        size_t start = ite->second.find("/") + 1;
+        size_t end = ite->second.find_first_of("\r\n");
+        std::string type = ite->second.substr(start, end - start);
         std::string name = fullpath+ "3ar.";
         name += type;
         body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
@@ -25,6 +27,12 @@ void Request::pars_chunked_body(size_t size) {
             std::cerr << "Error: Could not open file" << std::endl;
             exit(1);
         }
+        body.write(a_body.c_str(), a_body.size());
+    }
+    else
+    {
+        status_value = 400;
+        return ;
     }
     while (!data.empty()) {
         std::string chunkSizeStr;
@@ -90,9 +98,30 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
                 read = true;
             }
             fill_header(size);
-			 matching(parsing, infoconfig);
+			matching(parsing, infoconfig);
             if(status_value == 0)
                 check_request(parsing);
+            if(status_value == 201 && k == -4)
+            {
+                std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
+                if(ite != header.end())
+                {  
+                    size_t start = ite->second.find("/") + 1;
+                    size_t end = ite->second.find_first_of("\r\n");
+                    std::string type = ite->second.substr(start, end - start);
+                    std::string name = fullpath+ "3ar.";
+                    name += type;
+                    body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
+                    if(!body.is_open())
+                    {
+                        std::cerr << "Error: Could not open file" << std::endl;
+                        exit(1);
+                    }
+                    body.write(a_body.c_str(), a_body.size());
+                }
+                else
+                    status_value = 400;
+            }
             if(status_value != 201)
             {
                 read = true;
@@ -147,7 +176,8 @@ void Request::parse_header(size_t size)
             {
                 content_length = std::atoi(header["Content-Length"].c_str());
                 k = -4;
-                if(size < content_length)
+                size = 0;
+                if(size > content_length)
                 {
                     status_value = 413;
                     read = true;
@@ -165,12 +195,11 @@ void Request::parse_header(size_t size)
             }
         }
     }
-    if(status == true && k < 0)
+    if(status == true && k == -4)
     {   
         std::string body_content((std::istreambuf_iterator<char>(header_stream)), std::istreambuf_iterator<char>());
-        body << body_content;
-        len = body.tellp();
-
+        a_body = body_content;
+        len = a_body.size();
         if(len == content_length)
             read  = true;
     }
