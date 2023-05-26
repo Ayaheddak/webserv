@@ -17,7 +17,7 @@
         e.preventDefault(); // Prevents the form from submitting normally
 
         // Send a POST request to the server
-        const formData = new FormData(this);
+        const formData =  FormData(this);
         fetch('/submit', {
           method: 'POST',
           body: formData

@@ -105,6 +105,14 @@ void Request::check_request(std::vector<Config>& parsing)
         else
             status_value = 404;
     }
+    std::vector<std::string>::iterator ite;
+    for(ite = it->getAllowMethods().begin();ite != it->getAllowMethods().end();ite++)
+    {
+        if(*ite == getMethod())
+            break;
+    }
+    if(ite == it->getAllowMethods().end())
+        status_value = 405;
     if(status_value > 0)
         return;
     if(getMethod() == "GET")

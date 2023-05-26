@@ -132,7 +132,6 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
         {
             body.write(str, length);
             len = len + length;
-            // std::cout << len << std::endl;
         }
         if(len >= content_length && k < 0)
         {

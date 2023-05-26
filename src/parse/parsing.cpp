@@ -212,23 +212,28 @@ void Config::check_config(std::ifstream &file, std::string line)
 		else if (tmp == "index")
 			_index = value;
 		else if (tmp == "location")
-		{
-			Location loc;
-			iss >> check;
-			loc.readLocation(file,value, check, str);
-			if (loc.getIndex().empty())
-			{
-				if (!getIndex().empty())
-					loc.setIndex(getIndex());
-				else 
-				{
-					std::cerr << "Error : no index !!!" << std::endl;
-					exit(0);
-				}
-			}
-			this->_locations.push_back(loc);
-			check.clear();
-		}
+        {
+            Location loc;
+            std::vector<std::string> locMethods;
+            iss >> check;
+            loc.readLocation(file,value, check, str);
+            if (loc.getIndex().empty())
+            {
+                if (!getIndex().empty())
+                    loc.setIndex(getIndex());
+                else 
+                {
+                    std::cerr << "Error : no index !!!" << std::endl;
+                    exit(0);
+                }
+            }
+            for(size_t i = 0 ; i < loc.getAllowMethods().size(); i++)
+                locMethods.push_back(loc.getAllowMethods()[i]);
+            _locations.push_back(loc);
+            _locations.back().setAllowMethods(locMethods);
+            locMethods.clear();
+            check.clear();
+        }
 		iss >> check;
 		if (!check.empty())
 		{
