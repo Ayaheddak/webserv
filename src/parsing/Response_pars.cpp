@@ -105,13 +105,14 @@ void Request::check_request(std::vector<Config>& parsing)
         else
             status_value = 404;
     }
-    std::vector<std::string>::iterator ite;
-    for(ite = it->getAllowMethods().begin();ite != it->getAllowMethods().end();ite++)
+    size_t i;
+    for(i = 0 ; i < it->getAllowMethods().size(); i++)
     {
-        if(*ite == getMethod())
+        if(it->getAllowMethods()[i] == getMethod())
             break;
     }
-    if(ite == it->getAllowMethods().end())
+
+    if(i == it->getAllowMethods().size())
         status_value = 405;
     if(status_value > 0)
         return;
@@ -127,7 +128,6 @@ void Request::check_request(std::vector<Config>& parsing)
     {
         handle_delete(_host,*it);
     }
-    // std::cout << status_value << std::endl;
 }
 
 int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct FTW* ftwbuf)
@@ -251,3 +251,4 @@ void Request::handle_post(Config &config,Location location) // need request hna
         status_value = 404;
     }
 }
+
