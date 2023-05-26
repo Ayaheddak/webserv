@@ -1,6 +1,5 @@
-// #include "../../includes/Utils.hpp"
-// #include "../../includes/parsing.hpp"
-// ÷
+#include "../../includes/Utils.hpp"
+#include "../../includes/parsing.hpp"
 // int main(int ac , char **av) 
 // {
 // 	(void)ac;
@@ -10,8 +9,9 @@
     
 //     for (std::vector<Config>::iterator it = servers.begin(); it != servers.end(); ++it)
 //     {
+		
+// 		std::cout << "allowed methode : " << it->getLocations()[0].getAllowMethods()[0] << std::endl;
 // 		std::cout << "add server" <<std::endl;
 //     }
-
 //     return 0;
 // }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/26 04:46:14 by aheddak           #+#    #+#             */
+/*   Updated: 2023/05/26 04:58:36 by aheddak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/parsing.hpp"
 /*
 	===================================================================================================
@@ -33,9 +45,11 @@ Config& Config::operator= (const Config& obj)
     	_errorPages = obj._errorPages;
     	_clientMaxBodySize = obj._clientMaxBodySize;
     	_clientBodyTempPath = obj._clientBodyTempPath;
-    	_locations = obj._locations;
+    	// _locations = obj._locations;
 		_redirect = obj._redirect;
 		_index = obj._index;
+		for (size_t i = 0; i < obj._locations.size(); i++)
+			_locations.push_back(obj._locations[i]);
     }
     return (*this);
 }

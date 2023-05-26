@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   locationconf.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
+/*   Updated: 2023/05/26 04:55:55 by aheddak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/parsing.hpp"
 /*
 	=========================================== canonical form  ===============================================
@@ -29,6 +41,8 @@ Location& Location::operator=(const Location& other)
         _index = other._index;
         _upload = other._upload;
 		_redirect = other._redirect;
+		for (size_t i = 0; i < other._allowMethods.size(); i++)
+			_allowMethods.push_back(other._allowMethods[i]);
     }
     return *this;
 }

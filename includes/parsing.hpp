@@ -59,38 +59,38 @@ class Config
 		/*
 			===============================================================
 		*/
-		Config(void);
-		Config(const Config &copy);
-		Config& operator= (const Config& obj);
-		~Config(void);
+			Config(void);
+			Config(const Config &copy);
+			Config& operator= (const Config& obj);
+			~Config(void);
 		/*
 			===============================================================
 		*/
-		void setErrorPage(int code, const std::string& value);
-		std::map<int,std::string> getErrorPage(void);
-		void setServerName(std::string serverName);
-		std::string getServerName(void);
-		void setHost(std::string host);
-		std::string getHost(void) const;
-		std::string getListen(void) const;
-		void setListen(std::string listen);
-		std::string getRoot(void) const;
-		void setRoot(std::string root);
-		std::string getClientMaxBodySize(void) const;
-		void setClientMaxBodySize(std::string clientsize);
-		std::string getClientBodyTempPath(void) const;
-		void setClientBodyTempPath(std::string clientbody);
-		void setRedirect(int code, const std::string& value);
-		std::map<int, std::string> getRedirect() const;
-		void setIndex(const std::string& index);
-		void setLocations(const std::vector<Location>& locations);
-		std::vector<Location>& getLocations() ;
-		std::string getIndex() const;
+			void setErrorPage(int code, const std::string& value);
+			std::map<int,std::string> getErrorPage(void);
+			void setServerName(std::string serverName);
+			std::string getServerName(void);
+			void setHost(std::string host);
+			std::string getHost(void) const;
+			std::string getListen(void) const;
+			void setListen(std::string listen);
+			std::string getRoot(void) const;
+			void setRoot(std::string root);
+			std::string getClientMaxBodySize(void) const;
+			void setClientMaxBodySize(std::string clientsize);
+			std::string getClientBodyTempPath(void) const;
+			void setClientBodyTempPath(std::string clientbody);
+			void setRedirect(int code, const std::string& value);
+			std::map<int, std::string> getRedirect() const;
+			void setIndex(const std::string& index);
+			void setLocations(const std::vector<Location>& locations);
+			std::vector<Location>& getLocations() ;
+			std::string getIndex() const;
 		/*
 			===============================================================
 		*/
-		void check_config(std::ifstream &file, std::string line);
-		void check_servers(char *inputfile, std::vector<Config>& servers);
+			void check_config(std::ifstream &file, std::string line);
+			void check_servers(char *inputfile, std::vector<Config>& servers);
 
 };
 std::string removeLeadingWhitespace(std::string input);
