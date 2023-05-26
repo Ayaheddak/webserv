@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:14 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 04:58:36 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/26 07:20:16 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ Config& Config::operator= (const Config& obj)
     	_errorPages = obj._errorPages;
     	_clientMaxBodySize = obj._clientMaxBodySize;
     	_clientBodyTempPath = obj._clientBodyTempPath;
-    	// _locations = obj._locations;
 		_redirect = obj._redirect;
 		_index = obj._index;
 		for (size_t i = 0; i < obj._locations.size(); i++)
@@ -152,7 +151,7 @@ std::vector<Location>& Config::getLocations()
 {
     return _locations;
 }
-void Config::setLocations(const std::vector<Location>& locations) 
+void Config::setLocations(std::vector<Location> locations) 
 {
     _locations = locations;
 }
@@ -204,20 +203,24 @@ void Config::check_config(std::ifstream &file, std::string line)
 			_root = value;
 		else if (tmp == "error_page")
 		{
-			int	code;
+			int keeey;
+			keeey = atoi(value.c_str());
+			std::string	code;
 			iss >> code;
-			if (iss.fail() && iss.bad() && code < 300 && code > 599)
+			if (iss.fail() && iss.bad() && keeey < 300 && keeey > 599)
 			{
 				std::cerr << "Error in error Pages directive "<< std::endl;
 				exit(0);
 			}
-			_errorPages[code] = value;
+			_errorPages[keeey] = code;
 		}
 		else if (tmp == "redirect")
 		{
-			int	statuscode;
+			
+			std::string	statuscode;
 			iss >> statuscode;
-			_redirect[statuscode] = value;
+			_redirect[atoi(value.c_str())] = statuscode;
+			statuscode.clear();
 		}
 		else if (tmp == "client_max_body_size")
 			_clientMaxBodySize = value;
@@ -228,7 +231,7 @@ void Config::check_config(std::ifstream &file, std::string line)
 		else if (tmp == "location")
         {
             Location loc;
-            std::vector<std::string> locMethods;
+            // std::vector<std::string> locMethods;
             iss >> check;
             loc.readLocation(file,value, check, str);
             if (loc.getIndex().empty())
@@ -241,11 +244,16 @@ void Config::check_config(std::ifstream &file, std::string line)
                     exit(0);
                 }
             }
-            for(size_t i = 0 ; i < loc.getAllowMethods().size(); i++)
-                locMethods.push_back(loc.getAllowMethods()[i]);
+			if (loc.getAllowMethods().empty())
+			{
+				std::cerr << "Error : no allowed methods in loc block!!!" << std::endl;
+                exit(0);
+			}
+            // for(size_t i = 0 ; i < loc.getAllowMethods().size(); i++)
+            //     locMethods.push_back(loc.getAllowMethods()[i]);
             _locations.push_back(loc);
-            _locations.back().setAllowMethods(locMethods);
-            locMethods.clear();
+            // _locations.back().setAllowMethods(locMethods);
+            // locMethods.clear();
             check.clear();
         }
 		iss >> check;
@@ -256,5 +264,35 @@ void Config::check_config(std::ifstream &file, std::string line)
 		}
 		getline(file, line);
 		value.clear();
+	}
+}
+void Config::printServer() const 
+{
+    std::cout << "Server Name: " << _serverName << std::endl;
+    std::cout << "Host: " << _host << std::endl;
+    std::cout << "Listen: " << _listen << std::endl;
+    std::cout << "Root: " << _root << std::endl;
+
+    std::cout << "Error Pages:" << std::endl;
+    std::map<int, std::string>::const_iterator errorIter;
+    for (errorIter = _errorPages.begin(); errorIter != _errorPages.end(); ++errorIter) 
+	{
+        std::cout << "    Error " << errorIter->first << ": " << errorIter->second << std::endl;
+    }
+
+    std::cout << "Client Max Body Size: " << _clientMaxBodySize << std::endl;
+    std::cout << "Client Body Temp Path: " << _clientBodyTempPath << std::endl;
+
+    std::cout << "Redirects:" << std::endl;
+    std::map<int, std::string>::const_iterator redirectIter;
+    for (redirectIter = _redirect.begin(); redirectIter != _redirect.end(); ++redirectIter) 
+	{
+        std::cout << "redirect " << redirectIter->first << ": " << redirectIter->second << std::endl;
+    }
+    std::cout << "Index: " << _index << std::endl;
+	std::cout << "Locations: " << std::endl;
+	for (size_t i = 0; i < _locations.size(); i++)
+	{
+		_locations[i].printLocation();
 	}
 }

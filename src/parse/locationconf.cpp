@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 04:55:55 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/26 07:21:54 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Location::Location()
     _autoindex = "";
     _index = "";
     _upload = "";
-	_redirect = "";
+	_redirect.clear();
     _allowMethods.clear();
 }
 Location::Location(const Location& other)
@@ -107,9 +107,10 @@ std::vector<std::string> Location::getAllowMethods() const
     return _allowMethods;
 }
 
-void Location::setAllowMethods(const std::vector<std::string>& allowMethods)
+void Location::setAllowMethods(const std::vector<std::string> allowMethods)
 {
-    _allowMethods = allowMethods;
+	for (size_t i = 0; i < allowMethods.size(); i++)
+		_allowMethods.push_back(allowMethods[i]);
 }
 
 std::string Location::getUpload() const 
@@ -122,13 +123,14 @@ void Location::setUpload(const std::string& upload)
 	_upload = upload;
 }
 
-std::string Location::getRedirect() const 
+void Location::setRedirect(int code, const std::string& value)
+{
+    _redirect[code] = value;
+}
+
+std::map<int, std::string> Location::getRedirect() const 
 {
     return _redirect;
-}
-void Location::setRedirect(const std::string& redirect )
-{
-	_redirect = redirect;
 }
 /*
 	=========================================== member func  ===============================================
@@ -159,12 +161,19 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		else if (tmp == "location")
 		{
-			_redirect = value;
+			_locationPath = value;
 			if (check != "{")
 			{
 				std::cerr <<  "Error : location block 4 " << std::endl;
 				exit (0);
 			}
+		}
+		else if (tmp == "redirect")
+		{
+			std::string	statuscode;
+			iss >> statuscode;
+			_redirect[atoi(l1.c_str())] = statuscode;
+			statuscode.clear();
 		}
 		else if (tmp == "root")
 			_root = l1;
@@ -186,8 +195,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 				_allowMethods.push_back(l1);
 				l1.clear();
 				iss >> l1;
-			}
-
+			} 
 		}
 		else if (tmp == "upload")
 			_upload = l1;
@@ -209,4 +217,28 @@ std::string removeLeadingWhitespace(std::string input)
     while (i < input.length() && std::isspace(input[i])) 
         ++i;
     return input.substr(i);
+}
+
+void Location::printLocation() const 
+{
+    std::cout << "Location Path: " << _locationPath << std::endl;
+    std::cout << "Root: " << _root << std::endl;
+    std::cout << "CGI Path: " << _cgiPath << std::endl;
+    std::cout << "Autoindex: " << _autoindex << std::endl;
+    std::cout << "Index: " << _index << std::endl;
+    std::cout << "Upload: " << _upload << std::endl;
+
+    std::cout << "Redirects:" << std::endl;
+    std::map<int, std::string>::const_iterator redirectIter;
+    for (redirectIter = _redirect.begin(); redirectIter != _redirect.end(); redirectIter++) {
+        std::cout << "    Code " << redirectIter->first << ": " << redirectIter->second << std::endl;
+    }
+    std::cout << "Allowed Methods:" << std::endl;
+	// std::cout << "size = " << _allowMethods.size() << std::endl;
+	for (size_t i = 0; i < _allowMethods.size(); i++)
+		std::cout << "    " << _allowMethods[i] << std::endl;
+    // for (std::vector<std::string>::const_iterator methodIter = _allowMethods.begin(); methodIter < _allowMethods.end(); methodIter++) 
+	// {
+    //     std::cout << "    " << *methodIter << std::endl;
+    // }
 }

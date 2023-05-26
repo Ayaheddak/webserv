@@ -10,7 +10,7 @@ class Location
     	std::string 				_autoindex;//done
     	std::string 				_index;//done
 		std::string					_upload;//done
-		std::string 				_redirect;//done
+		std::map<int,std::string> 		_redirect;
     	std::vector<std::string> 	_allowMethods;//done
 	public :
 		Location(void);
@@ -31,15 +31,18 @@ class Location
 		std::string getIndex() const;
 		void setIndex(const std::string& index);
 		std::vector<std::string> getAllowMethods() const;
-		void setAllowMethods(const std::vector<std::string>& allowMethods);
+		void setAllowMethods(const std::vector<std::string> allowMethods);
 		std::string getUpload() const;
 		void setUpload(const std::string& upload);
-		std::string getRedirect() const;
-		void setRedirect(const std::string& redirect);
+		void setRedirect(int code, const std::string& value);
+		std::map<int, std::string> getRedirect() const;
+		// std::string getRedirect() const;
+		// void setRedirect(const std::string& redirect);
 		/*
 			============================= m func ===============================
 		*/
 		void readLocation(std::ifstream &file,std::string value, std::string check, std::string line);
+		void printLocation() const;
 };
 
 class Config
@@ -83,14 +86,15 @@ class Config
 			void setRedirect(int code, const std::string& value);
 			std::map<int, std::string> getRedirect() const;
 			void setIndex(const std::string& index);
-			void setLocations(const std::vector<Location>& locations);
 			std::vector<Location>& getLocations() ;
 			std::string getIndex() const;
+			void setLocations(std::vector<Location> locations);//
 		/*
 			===============================================================
 		*/
-			void check_config(std::ifstream &file, std::string line);
-			void check_servers(char *inputfile, std::vector<Config>& servers);
+		void check_config(std::ifstream &file, std::string line);
+		void check_servers(char *inputfile, std::vector<Config>& servers);
+		void printServer() const ;
 
 };
 std::string removeLeadingWhitespace(std::string input);

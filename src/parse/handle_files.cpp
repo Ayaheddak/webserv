@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 05:21:57 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/26 07:00:02 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,29 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 				server.check_config(infile, line);
 				if(server.getHost().empty() || server.getServerName().empty() || server.getListen().empty() || server.getLocations().empty())
 				{
-					std::cerr << "Error : waa khsnaa host,servername and listen ... " << std::endl;
+					std::cerr << "Error : nous avons besoin de host,servername et listen ... " << std::endl;
 					exit(0);
 				}
+				// std::vector<Location>::iterator it;
+				// for (it = server.getLocations().begin(); it != server.getLocations().end(); ++it)
+				// {
+				// 	if (it->getLocationPath() == "/")
+				// 		break ;
+				// }
+				// if (it == server.getLocations().end())
+				// {
+				// 	std::cout << "add static location" << std::endl;
+				// 	Location newLocation;
+				// 	newLocation.setRoot(server.getRoot());
+				// 	newLocation.setIndex(server.getIndex());
+				// 	std::vector<std::string> methods;
+				// 	methods.push_back("GET");
+				// 	newLocation.setAllowMethods(methods);
+				// 	newLocation.setLocationPath("/");
+				// 	server._locations.push_back(newLocation);
+				// }
 				servers.push_back(server);
+				server.printServer();
 			}
 		}
 		else
@@ -71,6 +90,7 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 		}
 	}
 }
+
 
 std::vector<Config> Servers(char *file)
 {
