@@ -1,33 +1,38 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/26 05:36:22 by aheddak           #+#    #+#             */
+/*   Updated: 2023/05/26 05:37:29 by aheddak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/parsing.hpp"
 #include "../../includes/Server.hpp"
 char* check_arguments(int argc, char** argv) 
 {
-    if (argc > 2) 
-	{
+    if (argc > 2) {
         std::cerr << "Too many arguments" << std::endl;
         exit(1);
-    }
-	else if (argc == 2) 
-	{
+    } else if (argc == 2) {
         std::string str = argv[1];
-        if (str.find(".conf") == std::string::npos) 
-		{
+        if (str.find(".conf") == std::string::npos) {
             std::cerr << "Invalid file extension" << std::endl;
             exit(1);
         }
         char* file = new char[str.length() + 1]; 
         std::strcpy(file, str.c_str()); 
         return file;
-    } 
-	else 
-	{
+    } else {
         std::ifstream infile("default.conf");
-        if (!infile.is_open()) 
-		{
+        if (!infile.is_open()) {
             std::cerr << "Configuration file not found" << std::endl;
             exit(0);
         }
-        char* file = new char[13]; 
+        char* file = new char[13];
         std::strcpy(file, "default.conf");
         return file;
     }
@@ -38,13 +43,12 @@ int main(int argc,char **argv)
 	{
     	std::list<std::pair<std::string, std::string> > _port;
     	std::vector<Config> servers;
-		char* result = check_arguments(argc, argv);
+		char* result;
+		result = check_arguments(argc, argv);
  		servers = Servers(result);
 		delete[] result;
-		//loop through servers and create a list of ip and port
 		for(size_t i = 0; i < servers.size(); i++)
 			_port.push_back(std::make_pair(servers[i].getHost(), servers[i].getListen()));
-    	// _port.push_back(std::make_pair(servers[0].getHost(), servers[0].getListen()));
     	Server server(_port, servers);
     	server.start(servers);
 	}
