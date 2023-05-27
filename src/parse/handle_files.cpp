@@ -6,16 +6,16 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 07:30:22 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 00:02:41 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.hpp"
 bool isDuplicateServer(std::vector<Config>& servers)
 {
-    for (std::vector<Config>::iterator it1 = servers.begin(); it1 != servers.end(); ++it1)
+    for (std::vector<Config>::iterator it1 = servers.begin(); it1 != servers.end(); it1++)
     {
-        for (std::vector<Config>::iterator it2 = it1 + 1; it2 != servers.end(); ++it2)
+        for (std::vector<Config>::iterator it2 = it1 + 1; it2 != servers.end(); it2++)
         {
             if (it1->getHost() == it2->getHost() && it1->getListen() == it2->getListen() && it1->getServerName() == it2->getServerName())
                 return true;

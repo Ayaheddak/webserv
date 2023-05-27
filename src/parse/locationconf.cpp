@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 07:21:54 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/26 23:31:42 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,8 @@ void Location::printLocation() const
     for (redirectIter = _redirect.begin(); redirectIter != _redirect.end(); redirectIter++) {
         std::cout << "    Code " << redirectIter->first << ": " << redirectIter->second << std::endl;
     }
+	// if(_redirect.find(301) != _redirect.end())
+	// 	exit(0);
     std::cout << "Allowed Methods:" << std::endl;
 	// std::cout << "size = " << _allowMethods.size() << std::endl;
 	for (size_t i = 0; i < _allowMethods.size(); i++)

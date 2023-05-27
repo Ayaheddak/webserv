@@ -289,15 +289,29 @@ Config Request::getServer(std::vector<Config> conf, std::pair<std::string, std::
 	// std::cout << "server not found" << std::endl;
 	// exit(1);
 }
+
+// std::string removeWhitespace(const std::string& str)
+// {
+//     std::string result = str;
+//     std::string::size_type pos = result.find_first_not_of(" \t\r\n");
+//     if (pos != std::string::npos)
+//         result.erase(0, pos);
+    
+//     pos = result.find_last_not_of(" \t\r\n");
+//     if (pos != std::string::npos)
+//         result.erase(pos + 1);
+    
+//     return result;
+// }
+
 void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
 {
-	// std::cout << "host in matching : " << infoconfig.first << std::endl;
-	// std::cout << "listen in matching : " << infoconfig.second << std::endl;
 	std::string search = header["Host"];
-	size_t f = search.find(":");
-	if (f != std::string::npos)
-		search = search.substr(0, f);
-
+	std::cout << "value of Host header--->" << header["Host"] << std::endl;
+	// std::cout << "value of search:" << value << std::endl;
+	// size_t f = search.find(":");
+	// if (f != std::string::npos)
+	// 	search = search.substr(0, f);
 	std::vector<Config>::iterator s = findMatchingConfig(conf, search, infoconfig);
 	if (s == conf.end())
 		s = findMatchingConfigWithoutName(conf, infoconfig);
@@ -310,14 +324,38 @@ void Request::matching(std::vector<Config> conf, std::pair<std::string, std::str
 		// exit(1);
 	}
 }
-
+std::string removeCarriageReturn(const std::string& str) {
+    std::string result;
+    
+    for (std::string::size_type i = 0; i < str.length(); ++i) {
+        if (str[i] != '\r') {
+            result += str[i];
+        }
+    }
+    
+    return result;
+}
 std::vector<Config>::iterator Request::findMatchingConfig(std::vector<Config>& conf, const std::string& search, const std::pair<std::string, std::string>& infoconfig)
 {
 	std::vector<Config>::iterator s;
+	std::string value;
 	for (s = conf.begin(); s != conf.end(); s++)
 	{
-		if (s->getServerName() == search && s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+		// std::cout << "infoconfig second: " << infoconfig.second << std::endl;//127.0.0.1
+		// std::cout << "listen: " << s->getListen() << std::endl;
+		// std::cout << std::endl;
+		// std::cout << "infoconfig first: " << infoconfig.first << std::endl;//8005
+		// std::cout << "host: " << s->getHost() << std::endl;
+		// std::cout << std::endl;
+		// std::cout << "server name: " << s->getServerName() << std::endl;
+		// std::cout << "search: " << search << std::endl;
+		// std::cout << std::endl;
+		value = removeCarriageReturn(search);
+		value = removeLeadingWhitespace(value);
+		std::cout << "value:" << value << std::endl;
+		if (s->getServerName() == value && s->getListen() == infoconfig.second && s->getHost() == infoconfig.first)
 		{
+			std::cout << "server found" << std::endl;
 			break;
 		}
 	}
@@ -329,7 +367,7 @@ std::vector<Config>::iterator Request::findMatchingConfigWithoutName(std::vector
 	std::vector<Config>::iterator s;
 	for (s = conf.begin(); s != conf.end(); s++)
 	{
-		if (s->getListen() == infoconfig.first && s->getHost() == infoconfig.second)
+		if (s->getListen() == infoconfig.second && s->getHost() == infoconfig.first)
 		{
 			break;
 		}

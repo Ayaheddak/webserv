@@ -94,8 +94,16 @@ void Server::start(std::vector<Config> &parsing)
 	FD_ZERO(&backupWrite);
 	FD_ZERO(&readFds);
 	FD_ZERO(&writeFds);
+	std::map<std::pair<std::string, std::string>, std::vector<std::pair<std::string, std::string> > > serverGroups;// Group servers with the same IP and port together
 	for (std::list<std::pair<std::string, std::string> >::iterator it = _infoconfig.begin(); it != _infoconfig.end(); it++)
-		_listners.push_back(create(*it));
+	{
+	    serverGroups[std::make_pair(it->first, it->second)].push_back(*it);
+	}
+	for (std::map<std::pair<std::string, std::string>, std::vector<std::pair<std::string, std::string> > >::iterator it = serverGroups.begin(); it != serverGroups.end(); it++)// Create a socket for each server group and add it to listeners
+	{
+		std::cout << "Creating socket for " << it->first.first << ":" << it->first.second << std::endl;						
+	    _listners.push_back(create(it->second.front()));
+	}
 	maxFds = std::numeric_limits<int>::min(); 
 	for (std::list<std::pair<std::pair<std::string, std::string>, int> >::iterator it = _listners.begin(); it != _listners.end(); it++)
 	{
