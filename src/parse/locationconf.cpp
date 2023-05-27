@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 22:52:12 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 23:32:46 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,12 +172,8 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		else if (tmp == "redirect")
 		{
-			std::cout << "redirect in main func " << std::endl;
-			exit(0);
-			std::cout << "l1 " << l1 << std::endl;
 			std::string	statuscode;
 			iss >> statuscode;
-			std::cout << "statuscode " << statuscode << std::endl;
 			_redirect[atoi(l1.c_str())] = statuscode;
 			statuscode.clear();
 		}

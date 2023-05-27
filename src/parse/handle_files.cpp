@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 22:46:23 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 23:32:12 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 					server._locations.push_back(newLocation);
 				}
 				servers.push_back(server);
-				server.printServer();
+				// server.printServer();
 			}
 		}
 		else

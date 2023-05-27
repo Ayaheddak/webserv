@@ -101,7 +101,7 @@ void Server::start(std::vector<Config> &parsing)
 	}
 	for (std::map<std::pair<std::string, std::string>, std::vector<std::pair<std::string, std::string> > >::iterator it = serverGroups.begin(); it != serverGroups.end(); it++)// Create a socket for each server group and add it to listeners
 	{
-		std::cout << "Creating socket for " << it->first.first << ":" << it->first.second << std::endl;						
+		std::cout << "Creating socket for " << it->first.first << " : " << it->first.second << std::endl;						
 	    _listners.push_back(create(it->second.front()));
 	}
 	maxFds = std::numeric_limits<int>::min(); 

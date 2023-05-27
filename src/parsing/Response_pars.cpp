@@ -105,13 +105,15 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     if(!it->getRedirect().empty())
     {
-        if(!it->getRedirect()[301].empty())
+        // if(!it->getRedirect()[301].empty()) // orignal
+		if (!it->getRedirect().at(301).empty()) // modified
         {
-            std::cout << it->getRedirect()[301] << std::endl;
-            fullpath = it->getRedirect()[301];
+            // std::cout << it->getRedirect()[301] << std::endl; // orignal
+            // fullpath = it->getRedirect()[301];	// orignal
+			fullpath = it->getRedirect().at(301); // modified
             status_value = 301;
             return;
-        }
+        } 
     }
     size_t i;
     i = 0;
