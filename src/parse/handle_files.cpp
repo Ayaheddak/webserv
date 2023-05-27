@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 00:02:41 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 22:46:23 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@ bool isDuplicateServer(std::vector<Config>& servers)
         }
     }
     return false;
+}
+
+bool isValidPath(const std::string& path) 
+{
+    std::ifstream file(path.c_str());
+    return file.good();
 }
 
 void Config::check_servers(char *inputfile, std::vector<Config>& servers)
@@ -61,7 +67,7 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 					std::cerr << "Error : nous avons besoin de host,servername et listen ... " << std::endl;
 					exit(0);
 				}
-				std::vector<Location>::iterator it;
+				std::vector<Location>::const_iterator it;
 				for (it = server.getLocations().begin(); it != server.getLocations().end(); ++it)
 				{
 					if (it->getLocationPath() == "/")
@@ -80,7 +86,7 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 					server._locations.push_back(newLocation);
 				}
 				servers.push_back(server);
-				// server.printServer();
+				server.printServer();
 			}
 		}
 		else

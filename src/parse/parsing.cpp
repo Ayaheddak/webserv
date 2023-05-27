@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:14 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 22:24:50 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 22:46:17 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ void Config::setRedirect(int code, const std::string& value)
     _redirect[code] = value;
 }
 
-std::map<int, std::string> Config::getRedirect() const 
+const std::map<int, std::string>& Config::getRedirect() const 
 {
     return _redirect;
 }
@@ -137,17 +137,17 @@ void Config::setServerName(std::string serverName)
     _serverName = serverName;
 }
 
-std::map<int,std::string> Config::getErrorPage(void)
+const std::map<int,std::string>& Config::getErrorPage(void)const
 {
     return (_errorPages);
 }
 
-std::string Config::getServerName(void)
+std::string Config::getServerName(void)const
 {
     return (_serverName);
 }
 
-std::vector<Location>& Config::getLocations() 
+const std::vector<Location>& Config::getLocations()const
 {
     return _locations;
 }
@@ -156,7 +156,7 @@ void Config::setLocations(std::vector<Location> locations)
     _locations = locations;
 }
 
-/*
+/*g
 	===================================================================================================
 */
 
@@ -216,7 +216,6 @@ void Config::check_config(std::ifstream &file, std::string line)
 		}
 		else if (tmp == "redirect")
 		{
-			
 			std::string	statuscode;
 			iss >> statuscode;
 			_redirect[atoi(value.c_str())] = statuscode;
@@ -231,7 +230,6 @@ void Config::check_config(std::ifstream &file, std::string line)
 		else if (tmp == "location")
         {
             Location loc;
-            // std::vector<std::string> locMethods;
             iss >> check;
             loc.readLocation(file,value, check, str);
             if (loc.getIndex().empty())
@@ -249,11 +247,7 @@ void Config::check_config(std::ifstream &file, std::string line)
 				std::cerr << "Error : no allowed methods in loc block!!!" << std::endl;
                 exit(0);
 			}
-            // for(size_t i = 0 ; i < loc.getAllowMethods().size(); i++)
-            //     locMethods.push_back(loc.getAllowMethods()[i]);
             _locations.push_back(loc);
-            // _locations.back().setAllowMethods(locMethods);
-            // locMethods.clear();
             check.clear();
         }
 		iss >> check;
@@ -266,33 +260,31 @@ void Config::check_config(std::ifstream &file, std::string line)
 		value.clear();
 	}
 }
+
 void Config::printServer() const 
 {
-    std::cout << "Server Name: " << _serverName << std::endl;
-    std::cout << "Host: " << _host << std::endl;
-    std::cout << "Listen: " << _listen << std::endl;
-    std::cout << "Root: " << _root << std::endl;
-
-    std::cout << "Error Pages:" << std::endl;
-    std::map<int, std::string>::const_iterator errorIter;
-    for (errorIter = _errorPages.begin(); errorIter != _errorPages.end(); ++errorIter) 
+	std::cout << "Server Name: " << this->getServerName() << std::endl;
+	std::cout << "Host: " << getHost() << std::endl;
+	std::cout << "Listen: " << getListen() << std::endl;
+	std::cout << "Root: " << getRoot() << std::endl;
+	std::cout << "Error Pages:" << std::endl;
+	std::map<int, std::string>::const_iterator errorIter;
+	for (errorIter = getErrorPage().begin(); errorIter != getErrorPage().end(); ++errorIter)
 	{
-        std::cout << "    Error " << errorIter->first << ": " << errorIter->second << std::endl;
-    }
-
-    std::cout << "Client Max Body Size: " << _clientMaxBodySize << std::endl;
-    std::cout << "Client Body Temp Path: " << _clientBodyTempPath << std::endl;
-
-    std::cout << "Redirects:" << std::endl;
-    std::map<int, std::string>::const_iterator redirectIter;
-    for (redirectIter = _redirect.begin(); redirectIter != _redirect.end(); ++redirectIter) 
+		std::cout << "    Error " << errorIter->first << ": " << errorIter->second << std::endl;
+	}
+	std::cout << " Redirect in server :" << std::endl;
+	std::map<int, std::string>::const_iterator redirectIter;
+	for (redirectIter = getRedirect().begin(); redirectIter != getRedirect().end(); ++redirectIter)
 	{
-        std::cout << "redirect " << redirectIter->first << ": " << redirectIter->second << std::endl;
-    }
-    std::cout << "Index: " << _index << std::endl;
-	std::cout << "Locations: " << std::endl;
-	for (size_t i = 0; i < _locations.size(); i++)
+		std::cout << "    Redirect " << redirectIter->first << " : " << redirectIter->second << std::endl;
+	}
+	std::cout << "Client Max Body Size: " << getClientMaxBodySize() << std::endl;
+	std::cout << "Client Body Temp Path: " << getClientBodyTempPath() << std::endl;
+	std::cout << "Index: " << getIndex() << std::endl;
+	std::cout << "Locations:" << std::endl;
+	for (size_t i = 0; i < getLocations().size(); i++)
 	{
-		_locations[i].printLocation();
+			_locations[i].printLocation();
 	}
 }

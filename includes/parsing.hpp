@@ -7,6 +7,7 @@ class Location
 		std::string 				_locationPath;//done
     	std::string 				_root;//done
 		std::string 				_cgiPath;//done
+		std::string 				_cgiExtension;
     	std::string 				_autoindex;//done
     	std::string 				_index;//done
 		std::string					_upload;//done
@@ -24,20 +25,21 @@ class Location
 		void setLocationPath(const std::string& locationPath);
 		std::string getRoot() const;
 		void setRoot(const std::string& root);
-		std::string getCgiPath() const;
-		void setCgiPath(const std::string& cgiPath);
+		
 		std::string getAutoindex() const;
 		void setAutoindex(const std::string& autoindex);
 		std::string getIndex() const;
 		void setIndex(const std::string& index);
-		std::vector<std::string> getAllowMethods() const;
-		void setAllowMethods(const std::vector<std::string> allowMethods);
 		std::string getUpload() const;
+		void setAllowMethods(const std::vector<std::string> allowMethods);
 		void setUpload(const std::string& upload);
 		void setRedirect(int code, const std::string& value);
-		std::map<int, std::string> getRedirect() const;
-		// std::string getRedirect() const;
-		// void setRedirect(const std::string& redirect);
+		const std::map<int, std::string>& getRedirect() const;
+		const std::vector<std::string>& getAllowMethods() const;
+		std::string getCgiPath() const;
+		void setCgiPath(const std::string& cgiPath);
+		std::string getCgiExtension() const;
+		void setCgiExtension(const std::string& cgiExtension);
 		/*
 			============================= m func ===============================
 		*/
@@ -70,9 +72,8 @@ class Config
 			===============================================================
 		*/
 			void setErrorPage(int code, const std::string& value);
-			std::map<int,std::string> getErrorPage(void);
 			void setServerName(std::string serverName);
-			std::string getServerName(void);
+			std::string getServerName(void)const;
 			void setHost(std::string host);
 			std::string getHost(void) const;
 			std::string getListen(void) const;
@@ -84,9 +85,13 @@ class Config
 			std::string getClientBodyTempPath(void) const;
 			void setClientBodyTempPath(std::string clientbody);
 			void setRedirect(int code, const std::string& value);
-			std::map<int, std::string> getRedirect() const;
 			void setIndex(const std::string& index);
-			std::vector<Location>& getLocations() ;
+
+			//
+			const std::map<int,std::string>& getErrorPage(void)const;
+			const std::map<int, std::string>& getRedirect() const;
+			const std::vector<Location>& getLocations()const;
+			//
 			std::string getIndex() const;
 			void setLocations(std::vector<Location> locations);//
 		/*
@@ -100,4 +105,5 @@ class Config
 std::string removeLeadingWhitespace(std::string input);
 bool isDuplicateServer(std::vector<Config>& servers);
 std::vector<Config> Servers(char *file);
+bool isValidPath(const std::string& path);
 #endif

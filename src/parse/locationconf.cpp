@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/26 23:31:42 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 22:52:12 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void Location::setIndex(const std::string& index)
     _index = index;
 }
 
-std::vector<std::string> Location::getAllowMethods() const 
+const std::vector<std::string>& Location::getAllowMethods() const 
 {
     return _allowMethods;
 }
@@ -128,7 +128,7 @@ void Location::setRedirect(int code, const std::string& value)
     _redirect[code] = value;
 }
 
-std::map<int, std::string> Location::getRedirect() const 
+const std::map<int, std::string>& Location::getRedirect() const 
 {
     return _redirect;
 }
@@ -154,8 +154,10 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 			std::cerr <<  "Error : location block " << std::endl;
 			exit (0);
 		}
-		if ((l1.empty() && l1 == "" && tmp != "root" && tmp != "cgi_path" && tmp != "autoindex" && tmp != "index" && tmp != "allow_Methods" && tmp != "upload" && tmp != "location" && tmp != "redirect"))
+		if ((l1.empty() && l1 == "" )|| (tmp != "root" && tmp != "cgi_path" && tmp != "cgi_name" && tmp != "autoindex" && tmp != "index" && tmp != "allow_methods" && tmp != "upload" && tmp != "location" && tmp != "redirect"))
 		{
+			std::cout << "l1 " << l1 << std::endl;
+			std::cout << "tmp " << tmp << std::endl;
 			std::cerr <<  "Error : location block   2 " << std::endl;
 			exit (0);
 		}
@@ -170,15 +172,26 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		else if (tmp == "redirect")
 		{
+			std::cout << "redirect in main func " << std::endl;
+			exit(0);
+			std::cout << "l1 " << l1 << std::endl;
 			std::string	statuscode;
 			iss >> statuscode;
+			std::cout << "statuscode " << statuscode << std::endl;
 			_redirect[atoi(l1.c_str())] = statuscode;
 			statuscode.clear();
 		}
 		else if (tmp == "root")
 			_root = l1;
 		else if (tmp == "cgi_path")
+		{
+			if (!isValidPath(l1))
+			{
+				std::cerr << "Error: cgi_path not valid" << std::endl;
+				exit(0);
+			}
 			_cgiPath = l1;
+		}
 		else if (tmp == "autoindex")
 			_autoindex = l1;
 		else if (tmp == "index")
@@ -199,6 +212,15 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		else if (tmp == "upload")
 			_upload = l1;
+		else if (tmp == "cgi_name")
+		{
+			if (!isValidPath(l1))
+			{
+				std::cerr << "Error: cgi extension not valid" << std::endl;
+				exit(0);
+			}
+			_cgiExtension = l1;
+		}
 		iss >>cheeck;
 		if (cheeck.empty())
 		{
@@ -218,29 +240,34 @@ std::string removeLeadingWhitespace(std::string input)
         ++i;
     return input.substr(i);
 }
+std::string Location::getCgiExtension() const
+{
+	return _cgiExtension;
+}
+
+void Location::setCgiExtension(const std::string& cgiExtension)
+{
+	_cgiExtension = cgiExtension;
+}
 
 void Location::printLocation() const 
 {
-    std::cout << "Location Path: " << _locationPath << std::endl;
-    std::cout << "Root: " << _root << std::endl;
-    std::cout << "CGI Path: " << _cgiPath << std::endl;
-    std::cout << "Autoindex: " << _autoindex << std::endl;
-    std::cout << "Index: " << _index << std::endl;
-    std::cout << "Upload: " << _upload << std::endl;
-
-    std::cout << "Redirects:" << std::endl;
-    std::map<int, std::string>::const_iterator redirectIter;
-    for (redirectIter = _redirect.begin(); redirectIter != _redirect.end(); redirectIter++) {
-        std::cout << "    Code " << redirectIter->first << ": " << redirectIter->second << std::endl;
-    }
-	// if(_redirect.find(301) != _redirect.end())
-	// 	exit(0);
-    std::cout << "Allowed Methods:" << std::endl;
-	// std::cout << "size = " << _allowMethods.size() << std::endl;
-	for (size_t i = 0; i < _allowMethods.size(); i++)
-		std::cout << "    " << _allowMethods[i] << std::endl;
-    // for (std::vector<std::string>::const_iterator methodIter = _allowMethods.begin(); methodIter < _allowMethods.end(); methodIter++) 
-	// {
-    //     std::cout << "    " << *methodIter << std::endl;
-    // }
+	std::cout << "Location Path: " << getLocationPath() << std::endl;
+	std::cout << "Root: " << getRoot() << std::endl;
+	std::cout << "CGI Path: " << getCgiPath() << std::endl;
+	std::cout << "Autoindex: " << getAutoindex() << std::endl;
+	std::cout << "Index: " << getIndex() << std::endl;
+	std::cout << "Upload: " << getUpload() << std::endl;
+	std::cout << "CGI Extension: " << getCgiExtension() << std::endl;
+	std::cout << "Redirects:" << std::endl;
+	std::map<int, std::string>::const_iterator redirectIter;
+	for (redirectIter = getRedirect().begin(); redirectIter != getRedirect().end(); redirectIter++)
+	{
+		std::cout << "Status Code: " << redirectIter->first << " Redirect: " << redirectIter->second << std::endl;
+	}
+	std::cout << "Allow Methods:" << std::endl;
+	for (size_t i = 0; i < getAllowMethods().size(); i++)
+	{
+		std::cout << "    " << getAllowMethods()[i] << std::endl;
+	}
 }
