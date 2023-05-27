@@ -4,6 +4,13 @@
 #include <ftw.h>
 #include <iostream>
 #include <sys/stat.h>
+std::string trim_leading_chars(const std::string& input, const std::string& chars) {
+    size_t pos = input.find_first_not_of(chars);
+    if (pos != std::string::npos)
+        return input.substr(pos);
+    else
+        return ""; // all characters were trimmed, return an empty string
+}
 std::string get_f_type(std::string str)
 {
     std::string type = str.erase(0,str.find("."));
@@ -147,11 +154,7 @@ void Response::respons_200(std::string index)
     if(!html_file.is_open())
     {
         glen = 0;
-        if(index[i] == '.')
-        {
-            while(index[i] == '.' || index[i] == '/')
-                i++;
-        }
+        index = trim_leading_chars(index, "./");
         index = index.substr(i);
 
         html_file.open(index.c_str(), std::ios::in | std::ios::binary);
@@ -193,6 +196,12 @@ int Response::check_status()
         error_generetor("413 Payload Too Large");
     else if(r_data.status_value == 500)
         error_generetor("Internal Server Error");
+    else if(r_data.status_value == 409)
+       error_generetor("409 Conflict");
+        else if(r_data.status_value == 414)
+       error_generetor("Request-URI Too Long");
+    else if(r_data.status_value == 413)
+       error_generetor("404 Not Found");
     else if(r_data.status_value == 1)
         respons_ai();
     else if(r_data.status_value == 204)

@@ -74,7 +74,7 @@ void Request::handle_get(Config &config, Location location)
             }
         } else {
             fullpath = targetPath;
-            status_value = (access(fullpath.c_str(), F_OK) != -1) && access(targetPath.c_str(), R_OK) != 0 ? 200 : 404;
+            status_value = (access(fullpath.c_str(), F_OK) != -1 && access(fullpath.c_str(), R_OK) != -1) ? 200 : 403;
         }
     } else {
         status_value = 404;
@@ -137,6 +137,7 @@ void Request::check_request(std::vector<Config>& parsing)
     {
         handle_delete(_host,*it);
     }
+    std::cout << status_value << std::endl;
 }
 
 int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct FTW* ftwbuf)
@@ -179,12 +180,12 @@ void Request::handle_delete(Config &config,Location location)
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
 
-if (access(targetPath.c_str(), R_OK) != 0 || access(targetPath.c_str(), W_OK) != 0) {
+    if (stat(targetPath.c_str(), &sb) == 0) {
+        if (access(targetPath.c_str(), R_OK) != 0 || access(targetPath.c_str(), W_OK) != 0) {
             std::cout << "Access denied to " << targetPath << std::endl;
             status_value = 403;
             return;
         }
-    if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
             if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
                 status_value = 409;
@@ -231,7 +232,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
 
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/') {
+            if (getPath()[getPath().size() - 1] != '/' && size != 0) {
                 status_value = 301;
                 fullpath = getPath() + '/';
                 return;
@@ -260,6 +261,6 @@ void Request::handle_post(Config &config,Location location) // need request hna
     } else {
         status_value = 404;
     }
-}
+}   
 
 

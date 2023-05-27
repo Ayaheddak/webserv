@@ -63,6 +63,7 @@ void Response::error_generetor(std::string str)
         }
         if(check == false)
         {
+            length = 0;
             response << "HTTP/1.1 " << r_data.status_value << " " << str << "\r\n";
             response << "Content-Type: text/html\r\n";
             response << "Content-Length: " << 0 << "\r\n";
