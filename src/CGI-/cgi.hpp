@@ -6,7 +6,7 @@
 /*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 16:29:18 by mrafik            #+#    #+#             */
-/*   Updated: 2023/05/25 16:29:19 by mrafik           ###   ########.fr       */
+/*   Updated: 2023/05/27 18:35:52 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 
 class Cgi {
     private:
+		std::vector<pid_t>					childPids;
 		void								_initEnv(Request &request, Config &config ,Location &location);
 		char								**_getEnvAsCstrArray() const;
 		int									_getSocket(unsigned int port);
@@ -34,5 +35,6 @@ class Cgi {
 		virtual ~Cgi(void);
 
 		Cgi   	&operator=(Cgi const &src);
+		void executeMultipleCgis(const std::vector<std::string>& scripts);
 		std::string		executeCgi(const std::string &scriptName);
 };
