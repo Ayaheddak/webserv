@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 16:55:00 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 00:02:41 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/27 02:39:42 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void Config::check_servers(char *inputfile, std::vector<Config>& servers)
 				Config			server;
 				getline(infile, line);
 				server.check_config(infile, line);
-				if(server.getHost().empty() || server.getServerName().empty() || server.getListen().empty() || server.getLocations().empty())
+				if(server.getHost().empty() || server.getListen().empty() || server.getLocations().empty())
 				{
 					std::cerr << "Error : nous avons besoin de host,servername et listen ... " << std::endl;
 					exit(0);
