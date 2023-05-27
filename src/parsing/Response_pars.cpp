@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sys/stat.h>
 
+
 #include <dirent.h>
 #include <unistd.h>
 
@@ -47,6 +48,10 @@ void Request::handle_get(Config &config, Location location)
     std::string targetPath = location.getRoot() + getPath().substr(size);
     std::cout << targetPath <<std::endl;
     if (stat(targetPath.c_str(), &sb) == 0) {
+        if (access(targetPath.c_str(), R_OK) != 0) {
+            status_value = 403;
+            return;
+        }
         if (S_ISDIR(sb.st_mode)) {
             if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
                 status_value = 301;
@@ -69,7 +74,7 @@ void Request::handle_get(Config &config, Location location)
             }
         } else {
             fullpath = targetPath;
-            status_value = (access(fullpath.c_str(), F_OK) != -1) ? 200 : 404;
+            status_value = (access(fullpath.c_str(), F_OK) != -1) && access(targetPath.c_str(), R_OK) != 0 ? 200 : 404;
         }
     } else {
         status_value = 404;
@@ -86,13 +91,6 @@ void Request::check_request(std::vector<Config>& parsing)
         Location location = *it;
         if (getPath().find(location.getLocationPath()) == 0 && location.getLocationPath() != "/")
         {
-            std::cout << it->getLocationPath() << std::endl;
-            /*if(it->getRedirect().find("301"))
-            {
-                fullpath = "gag";
-                status_value = 301;
-                return;
-            }*/
             break;
         }
     }
@@ -105,7 +103,18 @@ void Request::check_request(std::vector<Config>& parsing)
         else
             status_value = 404;
     }
+    if(!it->getRedirect().empty())
+    {
+        if(!it->getRedirect()[301].empty())
+        {
+            std::cout << it->getRedirect()[301] << std::endl;
+            fullpath = it->getRedirect()[301];
+            status_value = 301;
+            return;
+        }
+    }
     size_t i;
+    i = 0;
     for(i = 0 ; i < it->getAllowMethods().size(); i++)
     {
         if(it->getAllowMethods()[i] == getMethod())
@@ -135,11 +144,12 @@ int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct F
     (void) sb;
     (void) typeflag;
     (void) ftwbuf;
+     if (access(fpath, W_OK) != 0) {
+        return -1;
+    }
     if (remove(fpath) == 0) {
-        std::cout << "Deleted file: " << fpath << std::endl;
         return 0;
     } else {
-        std::cerr << "Failed to delete file: " << fpath << std::endl;
         return -1;
     }
 }
@@ -251,4 +261,5 @@ void Request::handle_post(Config &config,Location location) // need request hna
         status_value = 404;
     }
 }
+
 

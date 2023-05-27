@@ -13,111 +13,25 @@
 #include "../../includes/parsing.hpp"
 #include "../../includes/Request.hpp"
 
-void Request::pars_chunked_body(size_t size) {
-    size_t bodyStart = request.find("\r\n\r\n");
-    if (bodyStart == std::string::npos)
-    {
-        return;
-    }
-    bodyStart += 4;
-    std::string data = request.substr(bodyStart);
-    if(size < data.size())
-    {
-        size = 0;
-    }
-    std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
-    if(ite != header.end())
-    {      
-        size_t start = ite->second.find("/") + 1;
-        size_t end = ite->second.find_first_of("\r\n");
-        std::string type = ite->second.substr(start, end - start);
-        std::string name = fullpath+ "3ar.";
-        name += type;
-        body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
-        if(!body.is_open())
-        {
-            std::cerr << "Error: Could not open file" << std::endl;
-            exit(1);
-        }
-        body.write(a_body.c_str(), a_body.size());
-    }
-    else
-    {
-        status_value = 400;
-        return ;
-    }
-    while (!data.empty()) {
-        std::string chunkSizeStr;
-        size_t i = 0;
-        for (; i < data.size(); ++i) {
-            if (data[i] == '\r')
-            {
-                break;
-            }
-            chunkSizeStr += data[i];
-        }
-        unsigned int len;
-        std::stringstream ss;
-        ss << std::hex << chunkSizeStr;
-        ss >> len;
-
-
-        if (len == 0) {
-            break;
-        }
-        data = data.substr(chunkSizeStr.size() + 2);
-        if (data.size() >= len) {
-            std::string chunk_data = data.substr(0, len);
-            data = data.substr(len + 2);
-            body.write(chunk_data.c_str(), chunk_data.size());
-            body.flush(); 
-        } else {
-            break;
-        }
-    }
-    read = true;
-}
-
-
-void Request::request_append(const char *str,int length,size_t size,std::vector<Config>& parsing, std::pair<std::string, std::string> infoconfig)
+void Request::open_and_check(std::string appendedData)
 {
-        if(k == -2 && length == 0)
-        {
-            read = true;
-            return;
-        }
-        if(k > 0 && length > 0)
-        {
-            request.append(str,length);
-        }
-        if(k == 2 && status == true)
-        {
-            if(request.find("0\r\n\r\n") != std::string::npos)
-            {
-                pars_chunked_body(size);
-                return;
-            }
-        }
-        else if(request.find("\r\n\r\n") && k > 0)
-        {
-            k = 0;
-            if(request.find("POST") != std::string::npos|| request.find("DELETE")!=std::string::npos)
-            {
-                status = true;
-            }
-            else
-            {
-                read = true;
-            }
-            fill_header(size);
-			matching(parsing, infoconfig);
-            if(status_value == 0)
-                check_request(parsing);
-            if(status_value == 201 && k == -4)
-            {
-                std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
-                if(ite != header.end())
+    if(!_host.getClientMaxBodySize().empty())
+    {
+                    size_t nb;
+                    std::istringstream iss(_host.getClientMaxBodySize());
+                    iss >> nb;
+                        if( nb < appendedData.size())
+                        {
+                            status_value = 413;
+                            read = true;
+                            return;
+                        }
+    }
+                if(status_value == 201)
                 {  
+                        std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
+                        if(ite != header.end())
+                        {
                     size_t start = ite->second.find("/") + 1;
                     size_t end = ite->second.find_first_of("\r\n");
                     std::string type = ite->second.substr(start, end - start);
@@ -129,29 +43,100 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
                         std::cerr << "Error: Could not open file" << std::endl;
                         exit(1);
                     }
-                    body.write(a_body.c_str(), a_body.size());
+                    body.write(appendedData.c_str(), appendedData.size());
+                    }
+                    else
+                        status_value = 400;
                 }
-                else
-                    status_value = 400;
+}
+void Request::pars_chunked_body(size_t size) {
+    if(size == 0)
+        size = 0;
+    size_t bodyStart = request.find("\r\n\r\n");
+    bodyStart += 4;
+    std::string data = request.substr(bodyStart);
+   
+    std::string appendedData;
+    while (!data.empty()) {
+        std::string chunkSizeStr;
+        size_t i = 0;
+        for (; i < data.size(); ++i) {
+            if (data[i] == '\r') {
+                break;
             }
-            if(status_value != 201)
+            chunkSizeStr += data[i];
+        }
+
+        unsigned int len;
+        std::stringstream ss;
+        ss << std::hex << chunkSizeStr;
+        ss >> len;
+
+        if (len == 0) {
+            break;
+        }
+        data = data.substr(chunkSizeStr.size() + 2);
+        if (data.size() >= len) {
+            std::string chunk_data = data.substr(0, len);
+            data = data.substr(len + 2);
+            appendedData.append(chunk_data);
+        } else {
+            break;
+        }
+    }
+    open_and_check(appendedData);
+    read = true;
+}
+
+
+
+void Request::request_append(const char *str,int length,size_t size,std::vector<Config>& parsing, std::pair<std::string, std::string> infoconfig)
+{
+        if(k > 0 && length > 0)
+        {
+            request.append(str,length);
+        }
+        if(k == 2)
+        {
+            if(request.find("0\r\n\r\n") != std::string::npos)
+            {
+                pars_chunked_body(size);
+                return;
+            }
+        }
+        else if(request.find("\r\n\r\n") && k > 0)
+        {
+            k = 0;
+            fill_header(size);
+            if(status_value == 400 || status_value == 501)
             {
                 read = true;
                 return;
             }
+			matching(parsing, infoconfig);
+            if(status_value == 0)
+                check_request(parsing);
         }
         else if(k < 0 && length > 0)
         {
-            body.write(str, length);
             len = len + length;
+            a_body.append(str,length);
         }
-        if(len >= content_length && k < 0)
+        if(k == -4 && len >= content_length)
         {
+           open_and_check(a_body);
            read = true;
+        }
+        else if(request.find("0\r\n\r\n") != std::string::npos)
+        {
+                pars_chunked_body(size);
+                return;
         }
 }
 void Request::parse_header(size_t size)
 {
+    if(size == 0)
+        size = 0;
     std::istringstream header_stream(request);
     std::string line;
     std::getline(header_stream, line);
@@ -166,49 +151,37 @@ void Request::parse_header(size_t size)
             header[key] = value;
         }
     }
-    if(status == true)
-    {
-        std::map<std::string, std::string>::iterator it = header.find("Transfer-Encoding");
-            if(it != header.end())
-            {
-                if(header["Transfer-Encoding"] == " chunked\r")
-                    k = 2;
-                else
-                {
-                    status_value = 501;
-                    read = true;
-                    return ;
-                }
-            }
-        else
+    std::map<std::string, std::string>::iterator it = header.find("Transfer-Encoding");
+        if(it != header.end())
         {
-            std::map<std::string, std::string> ::iterator it = header.find("Content-Length");
-            if(it != header.end())
-            {
-                content_length = std::atoi(header["Content-Length"].c_str());
-                k = -4;
-                size = 0;
-                if(size > content_length)
-                {
-                    status_value = 413;
-                    read = true;
-                    return;
-                }
-            }
+            if(header["Transfer-Encoding"] == " chunked\r")
+                k = 2;
             else
             {
+                status_value = 501;
                 read = true;
-                return;
-                // std::map<std::string, std::string>::iterator it = header.find("Connection");
-                // if(it != header.end())
-                //     if(header["Connection"]== " close")
-                //         k = -1;
+                return ;
             }
         }
+    else
+    {
+        std::map<std::string, std::string> ::iterator it = header.find("Content-Length");
+        if(it != header.end())
+        {
+            content_length = std::atoi(header["Content-Length"].c_str());
+            k = -4;
+        }
+        else
+        {
+            if(getMethod() == "POST")
+                status_value = 400;
+            read = true;
+            return;
+        }
     }
-    if(status == true && k == -4)
-    {   
-        std::string body_content((std::istreambuf_iterator<char>(header_stream)), std::istreambuf_iterator<char>());
+    if(k == -4)
+    {
+        std::string body_content((std::istreambuf_iterator<char>(header_stream)), std::istreambuf_iterator<char>());   
         a_body = body_content;
         len = a_body.size();
         if(len == content_length)
@@ -219,7 +192,6 @@ void Request::parse_header(size_t size)
 void Request::fill_header(size_t size)
 {
     std::string data = request.substr(0,request.find("\r\n"));
-
     std::stringstream s(data);
     if(data[data.find("/")+1] != ' ')
     {

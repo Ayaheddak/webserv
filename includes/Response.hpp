@@ -22,8 +22,6 @@ class Response
          
     {
     }
-
-    // Copy assignment operator
     Response& operator=(const Response& other)
     {
         if (this != &other)
@@ -62,18 +60,20 @@ class Response
     void respons(int client_sock,std::vector<Config>& parsing);
     void respons_200(std::string index);
     void check_location(std::vector<Config>& parsing);
-    void respons_404(void);
+    void error_generetor(std::string str);
     void respons_201(std::string index);
     void respons_204(void);
     void respons_301(void);
     void respons_400(void);
     void respons_403(void);
+    void respons_501();
     void respons_405(void);
     void respons_413(void);
     void respons_500(void);
     void respons_504(void);
     void respons_ai(void);
 };  
+std::string get_f_type(std::string str);
 size_t whitespaces(std::string str,size_t n);
 size_t fill_data(std::string str,std::string dest,size_t n , std::string &data);
 #endif

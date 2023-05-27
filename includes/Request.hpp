@@ -39,6 +39,7 @@ class Request
         void handle_delete(Config &config,Location location);
         bool getread();
         int  getk();
+        void open_and_check(std::string apendedData);
 		void matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig);
 		std::vector<Config>::iterator findMatchingConfig(std::vector<Config>& conf, const std::string& name, const std::pair<std::string, std::string>& infoconfig);
 		std::vector<Config>::iterator findMatchingConfigWithoutName(std::vector<Config>& conf, const std::pair<std::string, std::string>& infoconfig);

@@ -141,12 +141,12 @@ void Server::start(std::vector<Config> &parsing)
 						continue ;
 					}
 					fcntl(clientSocket, F_SETFL, O_NONBLOCK); // Set the new socket to non-blocking mode
-					// if (clientSocket >= FD_SETSIZE)
-					// {
-					// 	std::cout << "Too many clients " << std::endl;
-					// 	close(clientSocket);
-					// 	continue ;
-					// }
+					 if (clientSocket >= FD_SETSIZE)
+					 {
+					 	std::cout << "Too many clients " << std::endl;
+					 	close(clientSocket);
+					 	continue ;
+					 }
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
@@ -174,7 +174,7 @@ void Server::start(std::vector<Config> &parsing)
 					}
 					std::cout << "Request from " << it->getClientInfo().first << " : " << it->getClientInfo().second << std::endl;
 					it->res_data.r_data.request_append(buffer,rec,atol(parsing[0].getClientMaxBodySize().c_str()),parsing, it->getClientInfo());
-					if (it->res_data.r_data.getread() == true)
+					if (it->res_data.r_data.getread() == true || rec == 0)
 					{
 						FD_CLR(i, &backupRead); 
 						FD_SET(i, &backupWrite);

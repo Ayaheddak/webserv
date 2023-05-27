@@ -82,16 +82,17 @@ void Response::check_location(std::vector<Config> &parsing)
 }
 void Response::respons_201(std::string index)
 {       index = "";
-        std::ostringstream response;
+        std::stringstream response;
         response << "HTTP/1.1 201 OK\r\n";
-        response << "Content-Type: text/html\r\n";
-        response << "Content-Length: 9\r\n";
+        response << "Content-Type: text/html; charset=UTF-8\r\n";
+        response << "Content-Length: " << 9 << "\r\n";
         response << "\r\n";
+        response << "File Sent";
         std::string str = response.str();
-        str.copy(response_buf2,str.length());
+        str.copy(response_buf2, str.length());
         response_buf2[str.length()] = '\0';
         len = strlen(response_buf2);
-        c = -3;
+
 }
 void Response::respons_204()
 {
@@ -102,11 +103,10 @@ void Response::respons_204()
     response << "Content-Length: " << 7 << "\r\n";
     response << "\r\n";
     response << "DELETED";
-    std::string response_str = response.str();
-    char* response_buf = new char[response_str.size() + 1];
-    std::copy(response_str.begin(), response_str.end(), response_buf);
-    response_buf[response_str.size()] = '\0';
-    response_buf1 = response_buf;
+    std::string str = response.str();
+    str.copy(response_buf2, str.length());
+    response_buf2[str.length()] = '\0';
+    len = strlen(response_buf2);
 
 }
 void Response::respons_301()
@@ -178,21 +178,25 @@ int Response::check_status()
     if(r_data.status_value == 301)
         respons_301();
     else if(r_data.status_value == 404)
-        respons_404();
+       error_generetor("404 Not Found");
+    else if(r_data.status_value == 501)
+        error_generetor("501 Not Implemented");
     else if(r_data.status_value == 400)
-        respons_400();
+        error_generetor("Bad Request");
     else if(r_data.status_value == 403)
-        respons_403();
+        error_generetor("Forbidden");
     else if(r_data.status_value == 405)
-        respons_405();
+    {
+        error_generetor("Method Not Allowed");
+    }
     else if(r_data.status_value == 413)
-        respons_413();
+        error_generetor("413 Payload Too Large");
     else if(r_data.status_value == 500)
-        respons_500();
-    else if(r_data.status_value == 500)
-        respons_500();
+        error_generetor("Internal Server Error");
     else if(r_data.status_value == 1)
         respons_ai();
+    else if(r_data.status_value == 204)
+        respons_204();
     else
         return 0;
     return 1;
@@ -209,9 +213,9 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
         c = -1;
     else if(r_data.getMethod() == "GET" && c != -4 && remaining.size() == 0)
         respons_200(r_data.fullpath);
-    else if(r_data.getMethod() == "POST")
+    else if(r_data.getMethod() == "POST" && r_data.status_value == 201)
     {
-        respons_201("src/parsing/index1.html");
+        respons_201("");
     }
     int i;
     if(len > 0 || c == -3)
@@ -219,6 +223,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        char buff[6000];
        if(remaining.size() > 0)
        {
+
             memcpy(buff,remaining.c_str(), len);
             remaining = "";
        }
@@ -235,7 +240,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        {
            if(i < len)
            {
-               remaining = std::string(buff + i, len -i);
+                remaining = std::string(buff + i, len -i);
                len = len - i;
            }
            glen = i + glen;
