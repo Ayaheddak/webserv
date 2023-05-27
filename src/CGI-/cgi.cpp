@@ -6,7 +6,7 @@
 /*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 16:29:14 by mrafik            #+#    #+#             */
-/*   Updated: 2023/05/27 18:38:06 by mrafik           ###   ########.fr       */
+/*   Updated: 2023/05/27 20:38:51 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Cgi::Cgi(Request &request, Config &config,Location &location)
 {
-    _body = request.getBody();
+    _body = request.getCgibody();
 	this->_initEnv(request, config,location);
 }
 
@@ -46,11 +46,11 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath(); // path dyal request source
 	this->_env["PATH_TRANSLATED"] = request.getPath(); // same
-	this->_env["QUERY_STRING"] = request.get_query();
+	this->_env["QUERY_STRING"] = request.getPath().substr(request.getPath().find('?')+1);
 	this->_env["REMOTEaddr"] = config.getHost(); // ip dyal client
 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
 	this->_env["REMOTE_USER"] = headers["Authorization"];
-	this->_env["REQUEST_URI"] = request.getPath() + request.get_query();
+	this->_env["REQUEST_URI"] = request.getPath();
 	if (headers.find("Hostname") != headers.end())
 		this->_env["SERVER_NAME"] = headers["Hostname"];
 	else
@@ -59,7 +59,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
-	this->_env.insert(config.get_cgi_pram().begin(), config.get_cgi_pram().end());
+	//this->_env.insert(config.get_cgi_pram().begin(), config.get_cgi_pram().end());
 }
 
 char					**Cgi::_getEnvAsCstrArray() const {

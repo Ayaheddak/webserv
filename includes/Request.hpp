@@ -11,9 +11,9 @@ class Request
         std::string                         request;
         std::string                         fullpath;
         std::string                         method;
-        std::string                         path;
+        std::string                         path;//url 
         std::string                         version;
-        std::fstream                         body;
+        std::fstream                        body;
         std::map<std::string, std::string>  header;
         bool                                read;
         bool                                status;
