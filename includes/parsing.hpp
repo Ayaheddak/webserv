@@ -34,7 +34,7 @@ class Location
 		void setAllowMethods(const std::vector<std::string> allowMethods);
 		void setUpload(const std::string& upload);
 		void setRedirect(int code, const std::string& value);
-		const std::map<int, std::string>& getRedirect() const;
+		 std::map<int, std::string> getRedirect() const;
 		const std::vector<std::string>& getAllowMethods() const;
 		std::string getCgiPath() const;
 		void setCgiPath(const std::string& cgiPath);
@@ -88,8 +88,8 @@ class Config
 			void setIndex(const std::string& index);
 
 			//
-			const std::map<int,std::string>& getErrorPage(void)const;
-			const std::map<int, std::string>& getRedirect() const;
+			std::map<int,std::string> getErrorPage(void)const;
+			 std::map<int, std::string>getRedirect() const;
 			const std::vector<Location>& getLocations()const;
 			//
 			std::string getIndex() const;

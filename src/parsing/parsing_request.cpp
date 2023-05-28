@@ -17,37 +17,43 @@ void Request::open_and_check(std::string appendedData)
 {
     if(!_host.getClientMaxBodySize().empty())
     {
-                    size_t nb;
-                    std::istringstream iss(_host.getClientMaxBodySize());
-                    iss >> nb;
-                        if( nb < appendedData.size())
-                        {
-                            status_value = 413;
-                            read = true;
-                            return;
-                        }
+      size_t nb;
+      std::istringstream iss(_host.getClientMaxBodySize());
+      iss >> nb;
+          if( nb < appendedData.size())
+          {
+              status_value = 413;
+              read = true;
+              return;
+          }
     }
-                if(status_value == 201)
-                {  
-                        std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
-                        if(ite != header.end())
-                        {
-                    size_t start = ite->second.find("/") + 1;
-                    size_t end = ite->second.find_first_of("\r\n");
-                    std::string type = ite->second.substr(start, end - start);
-                    std::string name = fullpath+ "3ar.";
-                    name += type;
-                    body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
-                    if(!body.is_open())
-                    {
-                        std::cerr << "Error: Could not open file" << std::endl;
-                        exit(1);
-                    }
-                    body.write(appendedData.c_str(), appendedData.size());
-                    }
-                    else
-                        status_value = 400;
-                }
+    cgi_body = appendedData;
+    if(status_value == 201)
+    {  
+            std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
+            if(ite != header.end())
+            {
+        size_t start = ite->second.find("/") + 1;
+        size_t end = ite->second.find_first_of("\r\n");
+        std::string type = ite->second.substr(start, end - start);
+        std::string name = fullpath+ "3ar.";
+        name += type;
+        body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
+        if(!body.is_open())
+        {
+            std::cerr << "Error: Could not open file" << std::endl;
+            exit(1);
+        }
+        body.write(appendedData.c_str(), appendedData.size());
+        }
+        else
+            status_value = 400;
+    }
+    if(status_value == -1)
+    {
+        // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
+        status_value = 0;
+    }
 }
 void Request::pars_chunked_body(size_t size) {
     if(size == 0)
@@ -116,6 +122,11 @@ void Request::request_append(const char *str,int length,size_t size,std::vector<
 			matching(parsing, infoconfig);
             if(status_value == 0)
                 check_request(parsing);
+            if(k == 2 && request.find("0\r\n\r\n") != std::string::npos)
+            {
+                pars_chunked_body(size);
+                return;
+            }
         }
         else if(k < 0 && length > 0)
         {
@@ -242,6 +253,10 @@ bool Request::getread()
 {
     return read;
 }
+std::string Request::getCgibody()
+{
+    return cgi_body;
+}
 int  Request::getk() 
 {
     return k;
@@ -307,6 +322,7 @@ void Request::matching(std::vector<Config> conf, std::pair<std::string, std::str
 		_host = getServer(conf,infoconfig);
 		// exit(1);
 	}
+   
 }
 std::string removeCarriageReturn(const std::string& str) {
     std::string result;

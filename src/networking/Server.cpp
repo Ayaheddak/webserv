@@ -172,7 +172,6 @@ void Server::start(std::vector<Config> &parsing)
 						FD_CLR(i, &backupWrite);
 						removeClient(i);
 					}
-					std::cout << "Request from " << it->getClientInfo().first << " : " << it->getClientInfo().second << std::endl;
 					it->res_data.r_data.request_append(buffer,rec,atol(parsing[0].getClientMaxBodySize().c_str()),parsing, it->getClientInfo());
 					if (it->res_data.r_data.getread() == true || rec == 0)
 					{

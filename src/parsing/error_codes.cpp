@@ -34,11 +34,12 @@ void Response::error_generetor(std::string str)
     if (!html_file.is_open())
     {
         glen = 0;
-        // if (!r_data._host.getErrorPage().empty() && !r_data._host.getErrorPage()[r_data.status_value].empty()) // original
-		if (!r_data._host.getErrorPage().empty() && !r_data._host.getErrorPage().at(r_data.status_value).empty()) // modifier here
+        if (!r_data._host.getErrorPage().empty() && !r_data._host.getErrorPage()[r_data.status_value].empty()) // original
+		//if (!r_data._host.getErrorPage().at(r_data.status_value).empty()) // modifier here
         {
-            // std::string index = r_data._host.getErrorPage()[r_data.status_value]; // original
-			std::string index = r_data._host.getErrorPage().at(r_data.status_value); // modifier here
+           
+            std::string index = r_data._host.getErrorPage()[r_data.status_value]; // original
+			//std::string index = r_data._host.getErrorPage().at(r_data.status_value); // modifier here
             if (index[i] == '.')
             {
                 while (index[i] == '.' || index[i] == '/')

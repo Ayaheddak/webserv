@@ -128,7 +128,7 @@ void Location::setRedirect(int code, const std::string& value)
     _redirect[code] = value;
 }
 
-const std::map<int, std::string>& Location::getRedirect() const 
+std::map<int, std::string> Location::getRedirect() const 
 {
     return _redirect;
 }

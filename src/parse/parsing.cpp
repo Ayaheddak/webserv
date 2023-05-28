@@ -122,7 +122,7 @@ void Config::setRedirect(int code, const std::string& value)
     _redirect[code] = value;
 }
 
-const std::map<int, std::string>& Config::getRedirect() const 
+std::map<int, std::string> Config::getRedirect() const 
 {
     return _redirect;
 }
@@ -137,7 +137,7 @@ void Config::setServerName(std::string serverName)
     _serverName = serverName;
 }
 
-const std::map<int,std::string>& Config::getErrorPage(void)const
+std::map<int,std::string> Config::getErrorPage(void)const
 {
     return (_errorPages);
 }

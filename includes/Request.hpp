@@ -8,6 +8,7 @@ class Request
     public:
         int                                 k;
         std::string                         a_body;
+        std::string                         cgi_body;
         std::string                         request;
         std::string                         fullpath;
         std::string                         method;
@@ -32,6 +33,7 @@ class Request
         std::string getPath() const;
         std::string getVersion() const;
         std::fstream &getBody();
+        std::string getCgibody();
         void pars_chunked_body(size_t size);
         void handle_get(Config &config, Location location);
         void check_request(std::vector<Config>& parsing);

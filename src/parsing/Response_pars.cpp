@@ -53,7 +53,7 @@ void Request::handle_get(Config &config, Location location)
             return;
         }
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
+            if (getPath()[getPath().size() - 1] != '/' &&getPath() != "") {
                 status_value = 301;
                 fullpath = getPath() + '/';
                 return;
@@ -70,7 +70,12 @@ void Request::handle_get(Config &config, Location location)
                 if (access(fullpath.c_str(), F_OK) == -1)
                     status_value = 403;  // No index file and autoindex is off
                 else
-                    status_value = 200;
+                {
+                    if(location.getCgiPath().empty())
+                        status_value = 200;
+                    else
+                        status_value = -1;
+                }
             }
         } else {
             fullpath = targetPath;
@@ -96,7 +101,7 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     if(it == locations.end())
     {
-        if(locations[0].getLocationPath()== "/")
+        if(locations[0].getLocationPath() == "/")
         {
             it = locations.begin();
         }
@@ -105,12 +110,12 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     if(!it->getRedirect().empty())
     {
-        // if(!it->getRedirect()[301].empty()) // orignal
-		if (!it->getRedirect().at(301).empty()) // modified
+         if(!it->getRedirect()[301].empty()) // orignal
+		//if (!it->getRedirect().at(301).empty()) // modified
         {
             // std::cout << it->getRedirect()[301] << std::endl; // orignal
-            // fullpath = it->getRedirect()[301];	// orignal
-			fullpath = it->getRedirect().at(301); // modified
+             fullpath = it->getRedirect()[301];	// orignal
+			//fullpath = it->getRedirect().at(301); // modified
             status_value = 301;
             return;
         } 
@@ -189,7 +194,7 @@ void Request::handle_delete(Config &config,Location location)
             return;
         }
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/' && location.getLocationPath() != "/") {
+            if (getPath()[getPath().size() - 1] != '/' && getPath() != "") {
                 status_value = 409;
                 return;
             }
@@ -234,7 +239,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
 
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/' && size != 0) {
+            if (getPath()[getPath().size() - 1] != '/' && getPath() != "") {
                 status_value = 301;
                 fullpath = getPath() + '/';
                 return;
@@ -248,8 +253,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
                     if(location.getCgiPath().empty())
                         status_value = 403;
                     else
-                         status_value = 201; // hna fin dir cgi blast had status
-                        //  Cgi.executeCgi(script);
+                         status_value = -1; // hna fin dir cgi blast had status
                 }
             }
         } else {
@@ -257,8 +261,8 @@ void Request::handle_post(Config &config,Location location) // need request hna
              if(location.getCgiPath().empty())
                 status_value = 403;
             else
-                 status_value = 201; // hna fin dir cgi blast had status
-                //   Cgi.executeCgi(script);
+                 status_value = -1; // hna fin dir cgi blast had status
+                //   Cgi.executeCgi(script) had cgi ececute script makaynch 7awl mnin dbr 3Lih mohim lbody li kayn fgetbody;
         }
     } else {
         status_value = 404;

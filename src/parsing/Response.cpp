@@ -240,7 +240,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        {
             memcpy(buff,response_buf2, len);
        }
-       i = send(client_sock, buff ,len, 0);
+       i = send(client_sock, buff ,len, MSG_NOSIGNAL);
        if(i == -1)
        {
             c = -4;
