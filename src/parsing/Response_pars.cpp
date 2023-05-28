@@ -254,6 +254,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
                         status_value = 403;
                     else
                          status_value = -1; // hna fin dir cgi blast had status
+                            // Cgi.executeCgi(location.getCgiExtension());
                 }
             }
         } else {
@@ -262,7 +263,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
                 status_value = 403;
             else
                  status_value = -1; // hna fin dir cgi blast had status
-                //   Cgi.executeCgi(script) had cgi ececute script makaynch 7awl mnin dbr 3Lih mohim lbody li kayn fgetbody;
+                //   Cgi.executeCgi(location.getCgiExtension()) had cgi ececute script makaynch 7awl mnin dbr 3Lih mohim lbody li kayn fgetbody;
         }
     } else {
         status_value = 404;
