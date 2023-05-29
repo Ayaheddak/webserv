@@ -1,7 +1,7 @@
 #include "../../includes/Response.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
-#include "../CGI-/cgi.hpp"
+#include "../CGI/cgi.hpp"
 #include <ftw.h>
 #include <iostream>
 #include <sys/stat.h>
@@ -96,6 +96,7 @@ void Request::check_request(std::vector<Config>& parsing)
         Location location = *it;
         if (getPath().find(location.getLocationPath()) == 0 && location.getLocationPath() != "/")
         {
+            _location = *it;
             break;
         }
     }
@@ -104,6 +105,7 @@ void Request::check_request(std::vector<Config>& parsing)
         if(locations[0].getLocationPath() == "/")
         {
             it = locations.begin();
+             _location = *it;
         }
         else
             status_value = 404;

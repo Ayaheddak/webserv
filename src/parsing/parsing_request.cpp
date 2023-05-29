@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_request.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/27 01:26:45 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 01:26:47 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/05/29 22:28:19 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/parsing.hpp"
 #include "../../includes/Request.hpp"
+#include"../CGI/cgi.hpp"
 
 void Request::open_and_check(std::string appendedData)
 {
+
     if(!_host.getClientMaxBodySize().empty())
     {
       size_t nb;
@@ -51,6 +53,8 @@ void Request::open_and_check(std::string appendedData)
     }
     if(status_value == -1)
     {
+        Cgi cgi(*this,_host,_location);
+        cgi.executeCgi(_location.getCgiExtension());
         // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
         status_value = 0;
     }

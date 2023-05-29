@@ -6,7 +6,7 @@
 /*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 16:29:14 by mrafik            #+#    #+#             */
-/*   Updated: 2023/05/27 20:49:02 by mrafik           ###   ########.fr       */
+/*   Updated: 2023/05/29 22:30:04 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["REDIRECT_STATUS"] = "200"; //ela qbl secruti to execute php-cgi
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = location.getCgiExtension(); //path dyql cgi
-	this->_env["SCRIPT_FILENAME"] = locoation.getCgiExtension() + location.getCgiPath(); //+  request.getPath() ; //the full path
+	this->_env["SCRIPT_FILENAME"] = location.getCgiExtension() + location.getCgiPath(); //+  request.getPath() ; //the full path
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
 	this->_env["CONTENT_LENGTH"] = std :: to_string(this->_body.length()); // lenght dyql body
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];

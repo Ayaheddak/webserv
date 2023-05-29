@@ -21,6 +21,7 @@ class Request
         size_t                              content_length;
         size_t                              len;
         int                                 status_value;
+        Location                            _location;
 		Config                         		_host;//for matching
     public :
         Request(){ status = false; k = 1; read = false; status_value = 0;}
