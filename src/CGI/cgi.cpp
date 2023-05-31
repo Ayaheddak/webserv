@@ -116,11 +116,17 @@ std::string		Cgi::executeCgi(const std::string& script)
 	}
 	else if (!pid)
 	{
-		char * const * nll = NULL;
+		//char * const * nll = NULL;
 
 		dup2(fdIn, 0);
 		dup2(fdOut, 1);
-		execve("/mnt/c/Users/EDWARD/Desktop/LKhdma/webserv/cgi.py", nll, env);
+		char **str = new char*[3];
+		str[0] = strdup("/Users/aainhaja/Desktop/webserv/php-cgi");
+		str[1]= strdup("/Users/aainhaja/Desktop/webserv/cgi.php");
+		str[2] =NULL;
+
+		execve("/Users/aainhaja/Desktop/webserv/php-cgi", str, env);
+		perror("Error:----->");
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "Status: 500\r\n\r\n", 15);
 	}
