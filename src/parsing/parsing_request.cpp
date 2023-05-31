@@ -51,13 +51,6 @@ void Request::open_and_check(std::string appendedData)
         else
             status_value = 400;
     }
-    if(status_value == -1)
-    {
-        Cgi cgi(*this,_host,_location);
-        cgi.executeCgi(_location.getCgiExtension());
-        // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
-        status_value = 0;
-    }
 }
 void Request::pars_chunked_body(size_t size) {
     if(size == 0)

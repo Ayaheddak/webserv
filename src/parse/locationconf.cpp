@@ -22,6 +22,7 @@ Location::Location()
     _autoindex = "";
     _index = "";
     _upload = "";
+	_cgiExtension = "";
 	_redirect.clear();
     _allowMethods.clear();
 }
@@ -40,6 +41,7 @@ Location& Location::operator=(const Location& other)
         _autoindex = other._autoindex;
         _index = other._index;
         _upload = other._upload;
+		_cgiExtension = other._cgiExtension;
 		_redirect = other._redirect;
 		for (size_t i = 0; i < other._allowMethods.size(); i++)
 			_allowMethods.push_back(other._allowMethods[i]);
@@ -215,6 +217,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 				std::cerr << "Error: cgi extension not valid" << std::endl;
 				exit(0);
 			}
+			std::cout << l1<< ","<< _locationPath <<std::endl;
 			_cgiExtension = l1;
 		}
 		iss >>cheeck;

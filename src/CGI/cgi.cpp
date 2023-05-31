@@ -10,7 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #include"cgi.hpp"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 Cgi::Cgi(Request &request, Config &config,Location &location)
 {
@@ -42,7 +45,9 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["SCRIPT_NAME"] = location.getCgiExtension(); //path dyql cgi
 	this->_env["SCRIPT_FILENAME"] = location.getCgiExtension() + location.getCgiPath(); //+  request.getPath() ; //the full path
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
-	this->_env["CONTENT_LENGTH"] = std :: to_string(this->_body.length()); // lenght dyql body
+	 std::stringstream ss;
+    ss << this->_body.length();
+	this->_env["CONTENT_LENGTH"] = ss.str(); // lenght dyql body
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath(); // path dyal request source
 	this->_env["PATH_TRANSLATED"] = request.getPath(); // same
@@ -92,13 +97,13 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 	saveStdin = dup(0);
 	saveStdout = dup(1);
-
 	FILE	*fIn = tmpfile();
 	FILE	*fOut = tmpfile();
 	long	fdIn = fileno(fIn);
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
+	(void)script;
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
 
@@ -115,7 +120,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 		dup2(fdIn, 0);
 		dup2(fdOut, 1);
-		execve(script.c_str(), nll, env);
+		execve("/mnt/c/Users/EDWARD/Desktop/LKhdma/webserv/cgi.py", nll, env);
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "Status: 500\r\n\r\n", 15);
 	}

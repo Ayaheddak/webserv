@@ -181,6 +181,7 @@ void Server::start(std::vector<Config> &parsing)
 				}
 				else if (FD_ISSET(i, &writeFds))
 				{
+					
 					std::list<Client>::iterator it;
 					for (it = _clients.begin(); it != _clients.end(); ++it)
    					{

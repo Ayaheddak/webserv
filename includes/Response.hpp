@@ -10,6 +10,7 @@ class Response
     std::fstream html_file;
     long glen;
     long length;
+    bool status;
     char response_buf2[6000];
     std::string remaining;
     char *response_buf1;
@@ -20,7 +21,7 @@ class Response
     Response(const Response& other)
         : sockfd(other.sockfd)
          
-    {
+    {status = other.status;
     }
     Response& operator=(const Response& other)
     {
@@ -30,7 +31,7 @@ class Response
             glen = other.glen;
             length = other.length;
             len = other.len;
-
+            status = other.status;
             char* new_response_buf1 = new char[len];
             std::memcpy(new_response_buf1, other.response_buf1, len * sizeof(char));
             delete[] response_buf1;
@@ -50,6 +51,7 @@ class Response
 		glen = 0;
 		length = 0;
 		len = 0;
+        status = false;
 	}
     int check_status();
     void check_path(Config &serverconfig);
@@ -66,6 +68,7 @@ class Response
     void respons_301(void);
     void respons_400(void);
     void respons_403(void);
+    void cgi_response();
     void respons_501();
     void respons_405(void);
     void respons_413(void);

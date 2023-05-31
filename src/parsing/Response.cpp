@@ -2,6 +2,7 @@
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
 #include <ftw.h>
+#include"../CGI/cgi.hpp"
 #include <iostream>
 #include <sys/stat.h>
 std::string trim_leading_chars(const std::string& input, const std::string& chars) {
@@ -176,9 +177,50 @@ void Response::respons_200(std::string index)
         len = html_file.gcount();
     }
 }
+
+void Response::cgi_response()
+{
+
+    if(status == false)
+    {
+        std::cout<<r_data._location.getCgiExtension()<<" here"<<std::endl;
+        Cgi cgi(r_data,r_data._host,r_data._location);
+        r_data.cgi_body = cgi.executeCgi(r_data._location.getCgiExtension());
+        // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
+        std::stringstream response;
+        response << "HTTP/1.1 200 OK\r\n";
+        response << "Content-Type: text/html\r\n";
+        response << "Content-Length: " << r_data.getCgibody().length() << "\r\n";
+        response << "\r\n";
+        std::string str = response.str();
+        length = r_data.getCgibody().size() + str.size();
+        str.copy(response_buf2,str.length());
+        response_buf2[str.length()] = '\0';
+        len = strlen(response_buf2);
+        std::cout << response_buf2<<std::endl;
+        status = true;
+    }
+    else
+    {
+        if( r_data.getCgibody().size() < 6000)
+        {
+             r_data.getCgibody().copy(response_buf2,r_data.getCgibody().size());
+             len = r_data.getCgibody().size();
+             r_data.cgi_body.erase(0,r_data.getCgibody().size());
+        }
+        else
+        {
+            r_data.getCgibody().copy(response_buf2,6000);
+            r_data.cgi_body.erase(0,6000);
+            len = 6000;
+        }
+    }
+}
 int Response::check_status()
 {
-    if(r_data.status_value == 301)
+    if(r_data.status_value == -1)
+        cgi_response();
+    else if(r_data.status_value == 301)
         respons_301();
     else if(r_data.status_value == 404)
        error_generetor("404 Not Found");
