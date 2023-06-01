@@ -6,7 +6,7 @@
 /*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 16:29:14 by mrafik            #+#    #+#             */
-/*   Updated: 2023/05/29 22:30:04 by mrafik           ###   ########.fr       */
+/*   Updated: 2023/06/01 23:56:03 by mrafik           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["REDIRECT_STATUS"] = "200"; //ela qbl secruti to execute php-cgi
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = location.getCgiExtension(); //path dyql cgi
+	std::cout << location.getCgiExtension() << "sadfasdfasdfsdfsdfsdfd\n";
 	this->_env["SCRIPT_FILENAME"] = location.getCgiExtension() + location.getCgiPath(); //+  request.getPath() ; //the full path
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
 	 std::stringstream ss;
@@ -52,6 +53,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["PATH_INFO"] = request.getPath(); // path dyal request source
 	this->_env["PATH_TRANSLATED"] = request.getPath(); // same
 	this->_env["QUERY_STRING"] = request.getPath().substr(request.getPath().find('?')+1);
+	std::cerr<< this->_env["QUERY_STRING"] << "FHDdsfgsdfgdsgds\n";
 	this->_env["REMOTEaddr"] = config.getHost(); // ip dyal client
 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
 	this->_env["REMOTE_USER"] = headers["Authorization"];
@@ -103,7 +105,6 @@ std::string		Cgi::executeCgi(const std::string& script)
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
-	(void)script;
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
 
@@ -120,13 +121,17 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 		dup2(fdIn, 0);
 		dup2(fdOut, 1);
+		std::string  yy;
 		char **str = new char*[3];
-		str[0] = strdup("/Users/aainhaja/Desktop/webserv/php-cgi");
-		str[1]= strdup("/Users/aainhaja/Desktop/webserv/cgi.php");
+		str[0] = strdup("/Users/mrafik/Desktop/gg/php-cgi");
+		str[1]= strdup(script.c_str());
 		str[2] =NULL;
-
-		execve("/Users/aainhaja/Desktop/webserv/php-cgi", str, env);
+		//yy = location.getCgiPath() + "/" + location.getCgiExtension() ;
+		execve("/Users/mrafik/Desktop/gg/php-cgi", str, env);
+		//std::string command = "python /Users/mrafik/Desktop/gg/cgi.py";
+		//std::system(command.c_str());
 		perror("Error:----->");
+		//exit(1);
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "Status: 500\r\n\r\n", 15);
 	}
