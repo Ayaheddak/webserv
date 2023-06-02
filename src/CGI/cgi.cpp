@@ -124,10 +124,10 @@ std::string		Cgi::executeCgi(const std::string& script)
 		dup2(fdOut, 1);
 		std::string  yy;
 		char **str = new char*[3];
-		//if(script.find(".php"))
+		if(script.find(".php") !=  std::string::npos)
 			str[0] = strdup("/usr/bin/php");
-		//if(script.find(".py"))
-			//str[0] = strdup("/usr/bin/python");
+		else if(script.find(".py") !=  std::string::npos)
+			str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
 		execve(str[0], str, env);
