@@ -171,34 +171,3 @@ std::string		Cgi::executeCgi(const std::string& script)
 std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
 	return (newBody);
 }
-
-// void Cgi :: executeMultipleCgis(const std::vector<std::string>& scripts) 
-// {
-// 	for (std::vector<std::string>::const_iterator it = scripts.begin(); it != scripts.end(); ++it) 
-// 	{
-// 		pid_t pid = fork();
-// 		if (pid == -1) {
-// 			std::cerr << "Fork failed." << std::endl;
-// 			exit(EXIT_FAILURE);
-// 		} else if (pid == 0) {
-// 			char * const * nll = NULL;
-// 			char **env = _getEnvAsCstrArray();
-// 			execve(it->c_str(), nll, env);
-// 			std::cerr << "Execve failed." << std::endl;
-// 			write(1, "Status: 500\r\n\r\n", 15);
-// 			exit(1);
-// 		} 
-// 		else {
-// 				childPids.push_back(pid);
-// 			}
-// 	}
-// 	for (std::vector<pid_t>::const_iterator it = childPids.begin(); it != childPids.end(); ++it) {
-// 		int status;
-// 		do {
-// 			if (waitpid(*it, &status, WUNTRACED | WCONTINUED) == -1) {
-// 				perror("waitpid");
-// 				exit(EXIT_FAILURE);
-// 			}
-// 		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
-// 	}
-// }
