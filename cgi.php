@@ -1,18 +1,32 @@
-#!/usr/bin/php-cgi
 <?php
-header("Content-Type: text/html");
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  // Check if file was uploaded
+  if (isset($_FILES['upload'])) {
+    // Check for file upload error
+    if ($_FILES['upload']['error'] !== UPLOAD_ERR_OK) {
+      die('Upload failed with error code ' . $_FILES['upload']['error']);
+    }
+    
+    // Move uploaded file to a permanent location
+    $filename = $_FILES['upload']['name'];
+    $tmpname = $_FILES['upload']['tmp_name'];
+    $destination = '/Users/mrafik/Desktop/webserv/' . $filename;
+    
+    if (move_uploaded_file($tmpname, $destination)) {
+      echo 'File uploaded successfully!';
+    } else {
+      echo 'Error while uploading file';
+    }
 
-// Get the value of the "name" parameter from the query string
-$name = $_GET['name'];
-
-echo "<html><head><title>Greetings</title></head><body>";
-echo "<h1>Greetings</h1>";
-
-if ($name) {
-  echo "<p>Hello, $name!</p>";
-} else {
-  echo "<p>Please provide a name parameter in the query string.</p>";
+  } else {
+    // Output message if no file was uploaded
+    echo 'No file uploaded.';
+  }
 }
-
-echo "</body></html>";
 ?>
+
+<!-- HTML form to upload files -->
+<form action="cgi" method="post" enctype="multipart/form-data">
+  <input type="file" name="upload">
+  <input type="submit" value="Upload">
+</form>

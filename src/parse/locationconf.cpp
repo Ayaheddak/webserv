@@ -187,7 +187,7 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 			{
 				std::cerr << "Error: cgi_path not valid" << std::endl;
 				exit(0);
-			}
+			}	
 			_cgiPath = l1;
 		}
 		else if (tmp == "autoindex")

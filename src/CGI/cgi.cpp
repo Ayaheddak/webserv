@@ -48,6 +48,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
 	 std::stringstream ss;
     ss << this->_body.length();
+	// this->_env["HTTP_COOKIE"] = 
 	this->_env["CONTENT_LENGTH"] = ss.str(); // lenght dyql body
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath(); // path dyal request source
@@ -107,7 +108,6 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
-
 	pid = fork();
 
 	if (pid == -1)
@@ -123,15 +123,11 @@ std::string		Cgi::executeCgi(const std::string& script)
 		dup2(fdOut, 1);
 		std::string  yy;
 		char **str = new char*[3];
-		str[0] = strdup("/Users/mrafik/Desktop/gg/php-cgi");
+		str[0] = strdup("/Users/mrafik/Desktop/webserv/php-cgi");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
-		//yy = location.getCgiPath() + "/" + location.getCgiExtension() ;
-		execve("/Users/mrafik/Desktop/gg/php-cgi", str, env);
-		//std::string command = "python /Users/mrafik/Desktop/gg/cgi.py";
-		//std::system(command.c_str());
+		execve(str[0], str, env);
 		perror("Error:----->");
-		//exit(1);
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "Status: 500\r\n\r\n", 15);
 	}
@@ -143,6 +139,8 @@ std::string		Cgi::executeCgi(const std::string& script)
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
+			std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
+		//return (newBody);
 		while (ret > 0)
 		{
 			memset(buffer, 0, 1024);
@@ -165,7 +163,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 	if (!pid)
 		exit(0);
-
+std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
 	return (newBody);
 }
 

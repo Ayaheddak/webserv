@@ -80,6 +80,8 @@ std::string get_f_type(std::string str)
         else if (type == "*/*"    ) return "*/*";
 	}
     return "application/octet-stream";
+    //text/plain rah ki downloeda kolchi 
+    // content lenght ki kon -1
 
 }
 
