@@ -187,6 +187,7 @@ void Response::cgi_response()
     {
         std::cout<<r_data._location.getCgiExtension()<<" here"<<std::endl;
         Cgi cgi(r_data,r_data._host,r_data._location);
+        //std::cout<< "QBL++++++++++++++++++>>>> "<<r_data.cgi_body <<'\n';
         r_data.cgi_body = cgi.executeCgi(r_data._location.getCgiPath()+ "/"+ r_data._location.getCgiExtension());
         // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
         std::stringstream response;

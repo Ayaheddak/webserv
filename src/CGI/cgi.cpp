@@ -107,6 +107,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 	int		ret = 1;
 
 	write(fdIn, _body.c_str(), _body.size());
+	std::cerr<< "ORIGINAL BODY============>> "<<_body << "\n";
 	lseek(fdIn, 0, SEEK_SET);
 	pid = fork();
 
@@ -123,7 +124,10 @@ std::string		Cgi::executeCgi(const std::string& script)
 		dup2(fdOut, 1);
 		std::string  yy;
 		char **str = new char*[3];
-		str[0] = strdup("/Users/mrafik/Desktop/webserv/php-cgi");
+		//if(script.find(".php"))
+			str[0] = strdup("/usr/bin/php");
+		//if(script.find(".py"))
+			//str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
 		execve(str[0], str, env);
@@ -139,7 +143,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
-			std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
+		std::cerr<< "BEFORE++++++++++new=body===========.>>>>>"<< newBody <<"\n";
 		//return (newBody);
 		while (ret > 0)
 		{
@@ -147,6 +151,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 			ret = read(fdOut, buffer, 1024 - 1);
 			newBody += buffer;
 		}
+		std::cerr<< "AFTER+++++++++new=body===========.>>>>>"<< newBody <<"\n";
 	}
 	dup2(saveStdin, STDIN_FILENO);
 	dup2(saveStdout, STDOUT_FILENO);

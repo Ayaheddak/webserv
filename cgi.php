@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!-- HTML form to upload files -->
-<form action="cgi" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
   <input type="file" name="upload">
   <input type="submit" value="Upload">
 </form>
