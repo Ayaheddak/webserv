@@ -1,12 +1,20 @@
 <?php
-// Start the session
 session_start();
 ?>
-
+<!DOCTYPE html>
+<html>
+<body>
 
 <?php
-// Set session variables
-$_SESSION["favcolor"] = "green";
-$_SESSION["favanimal"] = "cat";
-echo "Session variables are set.";
+// Echo session variables that were set on previous page
+if (isset($_SESSION["favcolor"]))
+    echo "Favorite color is " . $_SESSION["favcolor"] . ".<br>";
+else 
+    echo("favColor is not set" . "<br>");
+if (isset($_SESSION["favanimal"]))
+    echo "Favorite animal is " . $_SESSION["favanimal"] . ".";
+else
+    echo("favAnimal is not set" . "<br>");
 ?>
+</html>
+</body>

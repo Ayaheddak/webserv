@@ -2,49 +2,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include<signal.h>
-extern char **environ;
-
-Cgi::Cgi(Request &request, Config &config,Location &location)
-{
-    _body = request.getCgibody();
-	this->_initEnv2(request,location);
-	(void) config;
-	//this->_initEnv(request, config,location);
-}
-
-Cgi::~Cgi(void) {
-	return ;
-}
-
-Cgi	&Cgi::operator=(Cgi const &src) {
-	if (this != &src) {
-		this->_body = src._body;
-		this->_env = src._env;
-	}
-	return *this;
-}
-
-void Cgi::_initEnv2(Request& request, Location& location) 
-{
-    std::map<std::string, std::string> headers = request.getheader();
-
-    for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
-        std::string key = it->first;
-        key.insert(0, "HTTP_");
-        
-        for (std::string::size_type i = 0; i < key.length(); ++i) {
-            key[i] = std::toupper(key[i]);
-        }
-        std::replace(key.begin(), key.end(), '-', '_');
-        std::string value = it->second;
-        setenv(key.c_str(), value.c_str(), true);
-    }
-    
-    std::string scriptName = location.getCgiExtension();
-    setenv("SCRIPT_NAME", scriptName.c_str(), true);
-}
-
-
 void		Cgi::_initEnv(Request &request, Config &config, Location &location) 
 {
 
@@ -81,6 +38,52 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 
 	//this->_env.insert(config.get_cgi_pram().begin(), config.get_cgi_pram().end());
 }
+extern char **environ;
+
+Cgi::Cgi(Request &request, Config &config,Location &location)
+{
+    _body = request.getCgibody();
+	this->_initEnv2(request,location);
+	int i = 0;
+	while(environ[i])
+		std::cout << environ[i++] << std::endl;
+	(void) config;
+	//this->_initEnv(request, config,location);
+}
+
+Cgi::~Cgi(void) {
+	return ;
+}
+
+Cgi	&Cgi::operator=(Cgi const &src) {
+	if (this != &src) {
+		this->_body = src._body;
+		this->_env = src._env;
+	}
+	return *this;
+}
+
+void Cgi::_initEnv2(Request& request, Location& location) 
+{
+    std::map<std::string, std::string> headers = request.getheader();
+
+    for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
+        std::string key = it->first;
+        key.insert(0, "HTTP_");
+        for (std::string::size_type i = 0; i < key.length(); ++i) {
+            key[i] = std::toupper(key[i]);
+        }
+        std::replace(key.begin(), key.end(), '-', '_');
+        std::string value = it->second.substr(1);
+        setenv(key.c_str(), value.c_str(), true);
+    }
+    
+    std::string scriptName = location.getCgiExtension();
+    setenv("SCRIPT_NAME", scriptName.c_str(), true);
+}
+
+
+
 
 char					**Cgi::_getEnvAsCstrArray() const {
 	char	**env = new char*[this->_env.size() + 1];
@@ -134,13 +137,13 @@ std::string		Cgi::executeCgi(const std::string& script)
 		std::string  yy;
 		char **str = new char*[3];
 		if(script.find(".php") !=  std::string::npos)
-			str[0] = strdup("/Users/mrafik/Desktop/webserv/php-cgi");
+			str[0] = strdup("php-cgi");
 		else if(script.find(".py") !=  std::string::npos)
 			str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
-		// while(*environ)
-		// 	std::cout << *environ++ << std::endl;
+		for(int i = 0; environ[i];i++)
+			std::cout << environ[i] << std::endl; 
 		execve(str[0], str, environ);
 		perror("Error:----->");
 		std::cerr << "Execve Faild." << std::endl;
@@ -188,6 +191,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 
 	if (!pid)
 		exit(0);
+
 std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
 	return (newBody);
 }

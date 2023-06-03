@@ -210,9 +210,17 @@ void Response::cgi_response()
         // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
         std::stringstream response;
         response << "HTTP/1.1 200 OK\r\n";
-        response << "Content-Type: text/html\r\n";
-        response << "Content-Length: " << r_data.getCgibody().length() << "\r\n";
-        response << "\r\n";
+        std::string headers;
+        size_t pos = r_data.cgi_body.find("\r\n\r\n");
+        if (pos != std::string::npos)
+        {
+            headers = r_data.cgi_body.substr(0, pos + 4);  // Extract the headers
+            r_data.cgi_body = r_data.cgi_body.substr(pos + 4);     // Extract the body
+        }
+        response << headers;
+        std::cerr << "Headers: " << headers << std::endl;
+        std::cerr << "Body: " << r_data.cgi_body << std::endl;
+        // exit(0);
         std::string str = response.str();
         length = r_data.getCgibody().size() + str.size();
         str.copy(response_buf2,str.length());
@@ -223,18 +231,10 @@ void Response::cgi_response()
     }
     else
     {
-        if( r_data.getCgibody().size() < 6000)
-        {
-             r_data.getCgibody().copy(response_buf2,r_data.getCgibody().size());
-             len = r_data.getCgibody().size();
-             r_data.cgi_body.erase(0,r_data.getCgibody().size());
-        }
-        else
-        {
-            r_data.getCgibody().copy(response_buf2,6000);
-            r_data.cgi_body.erase(0,6000);
-            len = 6000;
-        }
+        len = std::min(r_data.cgi_body.length(), static_cast<size_t>(6000));
+        r_data.cgi_body.copy(response_buf2, len);
+        response_buf2[len] = '\0';
+        r_data.cgi_body.erase(0, len);
     }
 }
 int Response::check_status()

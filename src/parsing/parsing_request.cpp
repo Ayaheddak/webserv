@@ -133,6 +133,7 @@ void Request::parse_header(size_t size)
 {
     if(size == 0)
         size = 0;
+    std::cout << "xaml::::::"<<request << std::endl;
     std::istringstream header_stream(request);
     std::string line;
     std::getline(header_stream, line);
