@@ -205,6 +205,8 @@ void Response::cgi_response()
         Cgi cgi(r_data,r_data._host,r_data._location);
         //std::cout<< "QBL++++++++++++++++++>>>> "<<r_data.cgi_body <<'\n';
         r_data.cgi_body = cgi.executeCgi(r_data._location.getCgiPath()+ "/"+ r_data._location.getCgiExtension());
+        // if(r_data.cgi_body == "Timeout")
+        //     error_generetor("404 Not Found"); hadi ghi testit bih 
         // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
         std::stringstream response;
         response << "HTTP/1.1 200 OK\r\n";
@@ -301,7 +303,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        {
             memcpy(buff,response_buf2, len);
        }
-       i = send(client_sock, buff ,len, MSG_NOSIGNAL);
+       i = send(client_sock, buff ,len, 0);
        if(i == -1)
        {
             c = -4;

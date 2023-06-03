@@ -1,6 +1,7 @@
 #include"../../includes/cgi.hpp"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include<signal.h>
 
 Cgi::Cgi(Request &request, Config &config,Location &location)
 {
@@ -105,14 +106,12 @@ std::string		Cgi::executeCgi(const std::string& script)
 	}
 	else if (!pid)
 	{
-		//char * const * nll = NULL;
-
 		dup2(fdIn, 0);
 		dup2(fdOut, 1);
 		std::string  yy;
 		char **str = new char*[3];
 		if(script.find(".php") !=  std::string::npos)
-			str[0] = strdup("/usr/bin/php");
+			str[0] = strdup("/Users/mrafik/Desktop/webserv/php-cgi");
 		else if(script.find(".py") !=  std::string::npos)
 			str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
@@ -125,20 +124,29 @@ std::string		Cgi::executeCgi(const std::string& script)
 	else
 	{
 		char	buffer[1024] = {0};
-
-		waitpid(-1, NULL, 0);
+		size_t start=time(NULL);
+		int status = -1;
+		while((time(NULL) - start) < 10)
+		{
+			if(waitpid(pid, NULL,WNOHANG ) == pid)
+			{
+				status = 0;
+				break;
+			}
+		}
+		if(status == -1)
+		{
+			kill(pid, SIGKILL);
+			return("Timeout");
+		}
 		lseek(fdOut, 0, SEEK_SET);
-
 		ret = 1;
-		// std::cerr<< "BEFORE++++++++++new=body===========.>>>>>"<< newBody <<"\n";
-		//return (newBody);
 		while (ret > 0)
 		{
 			memset(buffer, 0, 1024);
 			ret = read(fdOut, buffer, 1024 - 1);
 			newBody += buffer;
 		}
-		// std::cerr<< "AFTER+++++++++new=body===========.>>>>>"<< newBody <<"\n";
 	}
 	dup2(saveStdin, STDIN_FILENO);
 	dup2(saveStdout, STDOUT_FILENO);

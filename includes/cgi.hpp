@@ -2,10 +2,10 @@
 #include "Utils.hpp"
 #include"Request.hpp"
 #include"parsing.hpp"
+#include "Response.hpp"
 
 class Cgi {
     private:
-		std::vector<pid_t>					childPids;
 		void								_initEnv(Request &request, Config &config ,Location &location);
 		char								**_getEnvAsCstrArray() const;
 		int									_getSocket(unsigned int port);
@@ -19,6 +19,5 @@ class Cgi {
 		virtual ~Cgi(void);
 
 		Cgi   	&operator=(Cgi const &src);
-		void executeMultipleCgis(const std::vector<std::string>& scripts);
 		std::string		executeCgi(const std::string &scriptName);
 };
