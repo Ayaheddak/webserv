@@ -2,11 +2,14 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include<signal.h>
+extern char **environ;
 
 Cgi::Cgi(Request &request, Config &config,Location &location)
 {
     _body = request.getCgibody();
-	this->_initEnv(request, config,location);
+	this->_initEnv2(request,location);
+	(void) config;
+	//this->_initEnv(request, config,location);
 }
 
 Cgi::~Cgi(void) {
@@ -20,6 +23,27 @@ Cgi	&Cgi::operator=(Cgi const &src) {
 	}
 	return *this;
 }
+
+void Cgi::_initEnv2(Request& request, Location& location) 
+{
+    std::map<std::string, std::string> headers = request.getheader();
+
+    for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
+        std::string key = it->first;
+        key.insert(0, "HTTP_");
+        
+        for (std::string::size_type i = 0; i < key.length(); ++i) {
+            key[i] = std::toupper(key[i]);
+        }
+        std::replace(key.begin(), key.end(), '-', '_');
+        std::string value = it->second;
+        setenv(key.c_str(), value.c_str(), true);
+    }
+    
+    std::string scriptName = location.getCgiExtension();
+    setenv("SCRIPT_NAME", scriptName.c_str(), true);
+}
+
 
 void		Cgi::_initEnv(Request &request, Config &config, Location &location) 
 {
@@ -76,16 +100,15 @@ std::string		Cgi::executeCgi(const std::string& script)
 	pid_t		pid;
 	int			saveStdin;
 	int			saveStdout;
-	char		**env;
+	//  char		**env;
 	std::string	newBody;
 
-	try {
-		env = this->_getEnvAsCstrArray();
-	}
-	catch (std::bad_alloc &e) {
-		std::cerr << e.what() << std::endl;
-	}
-
+	// try {
+	// 	env = this->_getEnvAsCstrArray();
+	// }
+	// catch (std::bad_alloc &e) {
+	// 	std::cerr << e.what() << std::endl;
+	// }
 	saveStdin = dup(0);
 	saveStdout = dup(1);
 	FILE	*fIn = tmpfile();
@@ -116,7 +139,9 @@ std::string		Cgi::executeCgi(const std::string& script)
 			str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
-		execve(str[0], str, env);
+		// while(*environ)
+		// 	std::cout << *environ++ << std::endl;
+		execve(str[0], str, environ);
 		perror("Error:----->");
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "Status: 500\r\n\r\n", 15);
@@ -157,9 +182,9 @@ std::string		Cgi::executeCgi(const std::string& script)
 	close(saveStdin);
 	close(saveStdout);
 
-	for (size_t i = 0; env[i]; i++)
-		delete[] env[i];
-	delete[] env;
+	// for (size_t i = 0; env[i]; i++)
+	// 	delete[] env[i];
+	//delete[] env;
 
 	if (!pid)
 		exit(0);

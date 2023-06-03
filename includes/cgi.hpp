@@ -10,6 +10,7 @@ class Cgi {
 		char								**_getEnvAsCstrArray() const;
 		int									_getSocket(unsigned int port);
 		int									_connectSocket(unsigned int port);
+		void								_initEnv2(Request &request,Location &location);
 		std::map<std::string, std::string>	_env;
 		std::string							_body;
 	public:

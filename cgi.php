@@ -1,4 +1,4 @@
 <?php
-while(1);
-    echo "Hello, World!";
+echo "Favorite color is " . $_SESSION["favcolor"] . ".<br>";
+echo "Favorite animal is " . $_SESSION["favanimal"] . ".";
 ?>
