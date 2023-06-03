@@ -23,16 +23,12 @@ std::string Request::handle_autoindex(const std::string& directoryPath) {
 
     while ((entry = readdir(dir)) != NULL) {
         std::string name = entry->d_name;
-
-        // Ignore the "." and ".." directories
-        if (name == "." || name == "..")
+        if (name == "." || name == "..") // kan ignori hadchi
             continue;
 
         html += "<a href=\"" + name + "\">" + name + "</a>\n";
     }
-
     closedir(dir);
-
     html += "</pre>\n<hr>\n</body>\n</html>\n";
     return html;
 }
@@ -58,17 +54,20 @@ void Request::handle_get(Config &config, Location location)
                 fullpath = getPath() + '/';
                 return;
             }
-            else if (location.getAutoindex() == "on")
-            {
-                fullpath = targetPath;  // For auto-indexing
-                a_body = handle_autoindex(targetPath);
-                status_value = 1;  // For auto-indexing
-                return;
-            }
             else {
                 fullpath = targetPath + "/" + location.getIndex();
                 if (access(fullpath.c_str(), F_OK) == -1)
-                    status_value = 403;  // No index file and autoindex is off
+                {
+                    if (location.getAutoindex() == "on")
+                    {
+                        fullpath = targetPath;
+                        a_body = handle_autoindex(targetPath);
+                        status_value = 1;  
+                        return;
+                    }
+                    else
+                        status_value = 403;
+                }
                 else
                 {
                     if(location.getCgiPath().empty())

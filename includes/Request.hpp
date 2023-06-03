@@ -24,7 +24,8 @@ class Request
         Location                            _location;
 		Config                         		_host;//for matching
     public :
-        Request(){ status = false; k = 1; read = false; status_value = 0;}
+        Request(){ status = false; a_body = "";k = 1; read = false; status_value = 0;}
+        
         void  clear();
         void request_append(const char *str,int length,size_t size,std::vector<Config>& parsing, std::pair<std::string, std::string> infoconfig);
         void parse_header(size_t size);
