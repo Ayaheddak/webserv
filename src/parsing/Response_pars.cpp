@@ -1,7 +1,7 @@
 #include "../../includes/Response.hpp"
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
-#include "../CGI/cgi.hpp"
+#include "../../includes/cgi.hpp"
 #include <ftw.h>
 #include <iostream>
 #include <sys/stat.h>
@@ -42,14 +42,17 @@ void Request::handle_get(Config &config, Location location)
     if(location.getLocationPath() != "/")
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
-    std::cout << targetPath <<std::endl;
+    // std::cout << targetPath <<std::endl;
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (access(targetPath.c_str(), R_OK) != 0) {
             status_value = 403;
             return;
         }
-        if (S_ISDIR(sb.st_mode)) {
-            if (getPath()[getPath().size() - 1] != '/' &&getPath() != "") {
+        if (S_ISDIR(sb.st_mode)) 
+        {
+            // if (getPath()[getPath().size() - 1] != '/' &&getPath() != "") 
+            if (!getPath().empty() && getPath()[getPath().size() - 1] != '/')
+            {
                 status_value = 301;
                 fullpath = getPath() + '/';
                 return;
@@ -145,7 +148,7 @@ void Request::check_request(std::vector<Config>& parsing)
     {
         handle_delete(_host,*it);
     }
-    std::cout << status_value << std::endl;
+    // std::cout << status_value << std::endl;
 }
 
 int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct FTW* ftwbuf)
@@ -201,7 +204,7 @@ void Request::handle_delete(Config &config,Location location)
             }
             else {
                 status_value = delete_directory_recursive(targetPath.c_str());
-                std::cout << status_value << std::endl;
+                // std::cout << status_value << std::endl;
             }
         } else {
             fullpath = targetPath;

@@ -21,6 +21,11 @@
 #include<netinet/in.h>  
 #include <fstream>
 #include <sstream>
+#include<string>
+#include<iostream>
+#include<map>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define PORT                8080
 #define TRUE                1

@@ -2,7 +2,7 @@
 #include "../../includes/Request.hpp"
 #include "../../includes/parsing.hpp"
 #include <ftw.h>
-#include"../CGI/cgi.hpp"
+#include"../../includes/cgi.hpp"
 #include <iostream>
 #include <sys/stat.h>
 std::string trim_leading_chars(const std::string& input, const std::string& chars) {
@@ -216,7 +216,7 @@ void Response::cgi_response()
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
         len = strlen(response_buf2);
-        std::cout << response_buf2<<std::endl;
+        // std::cout << response_buf2<<std::endl;
         status = true;
     }
     else

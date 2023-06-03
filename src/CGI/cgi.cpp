@@ -1,17 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   cgi.cpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/25 16:29:14 by mrafik            #+#    #+#             */
-/*   Updated: 2023/06/01 23:56:03 by mrafik           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-
-#include"cgi.hpp"
+#include"../../includes/cgi.hpp"
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -43,7 +30,7 @@ void		Cgi::_initEnv(Request &request, Config &config, Location &location)
 	this->_env["REDIRECT_STATUS"] = "200"; //ela qbl secruti to execute php-cgi
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	this->_env["SCRIPT_NAME"] = location.getCgiExtension(); //path dyql cgi
-	std::cout << location.getCgiExtension() << "sadfasdfasdfsdfsdfsdfd\n";
+	// std::cout << location.getCgiExtension() << "sadfasdfasdfsdfsdfsdfd\n";
 	this->_env["SCRIPT_FILENAME"] = location.getCgiExtension() + location.getCgiPath(); //+  request.getPath() ; //the full path
 	this->_env["REQUEST_METHOD"] = request.getMethod(); // http used    get ola post
 	 std::stringstream ss;
@@ -107,7 +94,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 	int		ret = 1;
 
 	write(fdIn, _body.c_str(), _body.size());
-	std::cerr<< "ORIGINAL BODY============>> "<<_body << "\n";
+	// std::cerr<< "ORIGINAL BODY============>> "<<_body << "\n";
 	lseek(fdIn, 0, SEEK_SET);
 	pid = fork();
 
@@ -143,7 +130,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
-		std::cerr<< "BEFORE++++++++++new=body===========.>>>>>"<< newBody <<"\n";
+		// std::cerr<< "BEFORE++++++++++new=body===========.>>>>>"<< newBody <<"\n";
 		//return (newBody);
 		while (ret > 0)
 		{
@@ -151,7 +138,7 @@ std::string		Cgi::executeCgi(const std::string& script)
 			ret = read(fdOut, buffer, 1024 - 1);
 			newBody += buffer;
 		}
-		std::cerr<< "AFTER+++++++++new=body===========.>>>>>"<< newBody <<"\n";
+		// std::cerr<< "AFTER+++++++++new=body===========.>>>>>"<< newBody <<"\n";
 	}
 	dup2(saveStdin, STDIN_FILENO);
 	dup2(saveStdout, STDOUT_FILENO);

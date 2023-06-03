@@ -1,18 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parsing_request.cpp                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mrafik <mrafik@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/27 01:26:45 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/29 22:28:19 by mrafik           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../includes/parsing.hpp"
 #include "../../includes/Request.hpp"
-#include"../CGI/cgi.hpp"
+#include"../../includes/cgi.hpp"
 
 void Request::open_and_check(std::string appendedData)
 {
@@ -303,7 +291,7 @@ Config Request::getServer(std::vector<Config> conf, std::pair<std::string, std::
 void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
 {
 	std::string search = header["Host"];
-	std::cout << "value of Host header--->" << header["Host"] << std::endl;
+	// std::cout << "value of Host header--->" << header["Host"] << std::endl;
 	// std::cout << "value of search:" << value << std::endl;
 	// size_t f = search.find(":");
 	// if (f != std::string::npos)
