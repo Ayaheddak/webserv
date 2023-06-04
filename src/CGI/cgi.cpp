@@ -44,11 +44,10 @@ Cgi::Cgi(Request &request, Config &config,Location &location)
 {
 	std::cerr<<"HEEEEEEEEEEEY\n";
     _body = request.getCgibody();
-	this->_initEnv2(request,location);
+	this->_initEnv2(request,location,config);
 	//int i = 0;
 	//while(environ[i])
 	//	std::cout << environ[i++] << std::endl;
-	(void) config;
 	//this->_initEnv(request, config,location);
 }
 
@@ -64,10 +63,10 @@ Cgi	&Cgi::operator=(Cgi const &src) {
 	return *this;
 }
 
-void Cgi::_initEnv2(Request& request, Location& location) 
+void Cgi::_initEnv2(Request& request, Location& location,Config &config) 
 {
     std::map<std::string, std::string> headers = request.getheader();
-
+	(void)config;
     for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         std::string key = it->first;
         key.insert(0, "HTTP_");
@@ -81,7 +80,16 @@ void Cgi::_initEnv2(Request& request, Location& location)
     
     std::string scriptName = location.getCgiExtension();
     setenv("SCRIPT_NAME", scriptName.c_str(), true);
+	std::cerr<<request.getPath().substr(request.getPath().find('?')+1).c_str() << "HANAAAAAAAAAAAAAAAA\n";
 	setenv("QUERY_STRING", request.getPath().substr(request.getPath().find('?')+1).c_str(),true);
+	setenv("REQUEST_METHOD", request.getMethod().c_str(),true);
+	setenv("REMOTEaddr", config.getHost().c_str(),true);
+	setenv("SERVER_PORT", config.getListen().c_str(),true);
+	 std::stringstream ss;
+    ss << this->_body.length();
+	setenv("CONTENT_LENGTH", ss.str().c_str(),true);
+	setenv("PATH_TRANSLATED",request.getPath().c_str(),true);
+	setenv("SCRIPT_FILENAME",(location.getCgiPath()+"/"+location.getCgiExtension()).c_str(),true);
 }
 
 

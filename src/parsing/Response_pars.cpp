@@ -84,7 +84,10 @@ void Request::handle_get(Config &config, Location location)
             status_value = (access(fullpath.c_str(), F_OK) != -1 && access(fullpath.c_str(), R_OK) != -1) ? 200 : 403;
         }
     } else {
-        status_value = 404;
+         if(!location.getCgiPath().empty() && getPath().find("?") != std::string::npos)
+            status_value = -1;
+        else
+            status_value = 404;
     }
 }
 
