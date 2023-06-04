@@ -42,6 +42,7 @@ extern char **environ;
 
 Cgi::Cgi(Request &request, Config &config,Location &location)
 {
+	std::cerr<<"HEEEEEEEEEEEY\n";
     _body = request.getCgibody();
 	this->_initEnv2(request,location);
 	//int i = 0;
@@ -80,6 +81,7 @@ void Cgi::_initEnv2(Request& request, Location& location)
     
     std::string scriptName = location.getCgiExtension();
     setenv("SCRIPT_NAME", scriptName.c_str(), true);
+	setenv("QUERY_STRING", request.getPath().substr(request.getPath().find('?')+1).c_str(),true);
 }
 
 
