@@ -79,7 +79,7 @@ void Response::error_generetor(std::string str)
     }
     else
     {
-        if(remaining.size() == 0 && c != -4)
+        if(remaining.size() == 0)
         {
             html_file.read(response_buf2, 6000);
             len = html_file.gcount();

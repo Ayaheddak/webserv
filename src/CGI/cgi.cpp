@@ -44,9 +44,9 @@ Cgi::Cgi(Request &request, Config &config,Location &location)
 {
     _body = request.getCgibody();
 	this->_initEnv2(request,location);
-	int i = 0;
-	while(environ[i])
-		std::cout << environ[i++] << std::endl;
+	//int i = 0;
+	//while(environ[i])
+	//	std::cout << environ[i++] << std::endl;
 	(void) config;
 	//this->_initEnv(request, config,location);
 }
@@ -142,8 +142,8 @@ std::string		Cgi::executeCgi(const std::string& script)
 			str[0] = strdup("/usr/bin/python");
 		str[1]= strdup(script.c_str());
 		str[2] =NULL;
-		for(int i = 0; environ[i];i++)
-			std::cout << environ[i] << std::endl; 
+		//for(int i = 0; environ[i];i++)
+		//	std::cout << environ[i] << std::endl; 
 		execve(str[0], str, environ);
 		perror("Error:----->");
 		std::cerr << "Execve Faild." << std::endl;

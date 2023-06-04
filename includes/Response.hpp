@@ -13,7 +13,6 @@ class Response
     bool status;
     char response_buf2[6000];
     std::string remaining;
-    char *response_buf1;
     long len;
     Request r_data;
     int c;
@@ -32,11 +31,6 @@ class Response
             length = other.length;
             len = other.len;
             status = other.status;
-            char* new_response_buf1 = new char[len];
-            std::memcpy(new_response_buf1, other.response_buf1, len * sizeof(char));
-            delete[] response_buf1;
-            response_buf1 = new_response_buf1;
-
             std::memcpy(response_buf2, other.response_buf2, sizeof(response_buf2));
 
                        c = other.c;
@@ -57,7 +51,7 @@ class Response
     void check_path(Config &serverconfig);
     void handle_get(Config &config,Location location);
     void handle_delete(Config &config,Location location);
-    void handle_post(Config &config,Location location);
+    void _post(Config &config,Location location);
     void check_request(std::vector<Config>& parsing);
     void respons(int client_sock,std::vector<Config>& parsing);
     void respons_200(std::string index);
