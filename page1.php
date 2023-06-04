@@ -1,20 +1,14 @@
-<?php
-session_start();
-?>
-<!DOCTYPE html>
 <html>
 <body>
 
 <?php
-// Echo session variables that were set on previous page
-if (isset($_SESSION["favcolor"]))
-    echo "Favorite color is " . $_SESSION["favcolor"] . ".<br>";
-else 
-    echo("favColor is not set" . "<br>");
-if (isset($_SESSION["favanimal"]))
-    echo "Favorite animal is " . $_SESSION["favanimal"] . ".";
-else
-    echo("favAnimal is not set" . "<br>");
+if(!isset($_COOKIE[$cookie_name])) {
+  echo "Cookie named '" . $cookie_name . "' is not set!";
+} else {
+  echo "Cookie '" . $cookie_name . "' is set!<br>";
+  echo "Value is: " . $_COOKIE[$cookie_name];
+}
 ?>
-</html>
+
 </body>
+</html>

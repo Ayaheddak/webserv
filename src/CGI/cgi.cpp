@@ -80,16 +80,16 @@ void Cgi::_initEnv2(Request& request, Location& location,Config &config)
     
     std::string scriptName = location.getCgiExtension();
     setenv("SCRIPT_NAME", scriptName.c_str(), true);
-	std::cerr<<request.getPath().substr(request.getPath().find('?')+1).c_str() << "HANAAAAAAAAAAAAAAAA\n";
+	//std::cerr<<request.getPath().substr(request.getPath().find('?')+1).c_str() << "HANAAAAAAAAAAAAAAAA\n";
 	setenv("QUERY_STRING", request.getPath().substr(request.getPath().find('?')+1).c_str(),true);
 	setenv("REQUEST_METHOD", request.getMethod().c_str(),true);
+	setenv("SCRIPT_FILENAME",(location.getCgiPath()+"/"+location.getCgiExtension()).c_str(),true); 
 	setenv("REMOTEaddr", config.getHost().c_str(),true);
 	setenv("SERVER_PORT", config.getListen().c_str(),true);
-	 std::stringstream ss;
+	std::stringstream ss;
     ss << this->_body.length();
 	setenv("CONTENT_LENGTH", ss.str().c_str(),true);
 	setenv("PATH_TRANSLATED",request.getPath().c_str(),true);
-	setenv("SCRIPT_FILENAME",(location.getCgiPath()+"/"+location.getCgiExtension()).c_str(),true);
 }
 
 

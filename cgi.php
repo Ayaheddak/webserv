@@ -1,17 +1,6 @@
 <?php
-// Start the session
-session_start();
+while(1);
+$cookie_name = "user";
+$cookie_value = "thats meeee";
+setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
 ?>
-<!DOCTYPE html>
-<html>
-<body>
-
-<?php
-// Set session variables
-$_SESSION["favcolor"] = "green";
-$_SESSION["favanimal"] = "cat";
-echo "Session variables are set.";
-?>
-
-</body>
-</html>
