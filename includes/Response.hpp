@@ -5,7 +5,6 @@
 class Response
 {
     public:
-    int sockfd;
     std::string fullpath;
     std::fstream html_file;
     long glen;
@@ -13,27 +12,27 @@ class Response
     bool status;
     char response_buf2[6000];
     std::string remaining;
+    char *response_buf1;
     long len;
     Request r_data;
     int c;
     int count;
     Response(const Response& other)
-        : sockfd(other.sockfd)
          
-    {status = other.status;
+    {
+        *this = other;
     }
     Response& operator=(const Response& other)
     {
         if (this != &other)
         {
-            sockfd = other.sockfd;
             glen = other.glen;
             length = other.length;
             len = other.len;
             status = other.status;
-            std::memcpy(response_buf2, other.response_buf2, sizeof(response_buf2));
 
-                       c = other.c;
+            std::memcpy(response_buf2, other.response_buf2, sizeof(response_buf2));
+            c = other.c;
             count = other.count;
 
         }
@@ -41,17 +40,20 @@ class Response
     }
     Response()
 	{
-		remaining = "";
-		glen = 0;
-		length = 0;
-		len = 0;
+        fullpath = "";
+        glen = 0;
+        length = 0;
         status = false;
+        remaining = "";
+        len = 0;
+        c = 0;
+        count = 0;
 	}
     int check_status();
     void check_path(Config &serverconfig);
     void handle_get(Config &config,Location location);
     void handle_delete(Config &config,Location location);
-    void _post(Config &config,Location location);
+    void handle_post(Config &config,Location location);
     void check_request(std::vector<Config>& parsing);
     void respons(int client_sock,std::vector<Config>& parsing);
     void respons_200(std::string index);

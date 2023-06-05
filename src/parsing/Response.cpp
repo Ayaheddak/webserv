@@ -177,11 +177,6 @@ void Response::respons_200(std::string index)
         index = index.substr(i);
 
         html_file.open(index.c_str(), std::ios::in | std::ios::binary);
-        if (!html_file.is_open()) {
-            r_data.status_value = 500;
-            error_generetor("Internal Server Error");
-            return;
-        }
         html_file.seekg (0, html_file.end);
         length = html_file.tellg();
         html_file.seekg (0, html_file.beg);
@@ -193,7 +188,6 @@ void Response::respons_200(std::string index)
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
         len = strlen(response_buf2);
-        length += len;
     }
     else
     {
@@ -207,12 +201,28 @@ void Response::cgi_response()
 
     if(status == false)
     {
+        std::cout<<r_data._location.getCgiExtension()<<" here"<<std::endl;
         Cgi cgi(r_data,r_data._host,r_data._location);
         //std::cout<< "QBL++++++++++++++++++>>>> "<<r_data.cgi_body <<'\n';
         r_data.cgi_body = cgi.executeCgi(r_data._location.getCgiPath()+ "/"+ r_data._location.getCgiExtension());
-        if(r_data.cgi_body == "Timeout")
-            error_generetor("404 Not Found"); //hadi ghi testit bih 
-        // hna fin t7t cgi , laknti kat9lb 3la script li 3ndk fcgi execute rah makaynch fserver aykhs nta li dbr 3Lih
+        if(r_data.cgi_body == "500")
+        {
+            r_data.status_value = 500;
+            error_generetor("Internal Server Error");
+            return;
+        }
+        else if(r_data.cgi_body == "404")
+        {
+            r_data.status_value = 404;
+            error_generetor("404 Not Found");
+            return;
+        }
+        else if(r_data.cgi_body == "504")
+        {
+            r_data.status_value = 504;
+            error_generetor("Timeout");
+            return;
+        }
         std::stringstream response;
         response << "HTTP/1.1 200 OK\r\n";
         std::string headers;
@@ -220,11 +230,11 @@ void Response::cgi_response()
         if (pos != std::string::npos)
         {
             headers = r_data.cgi_body.substr(0, pos + 4);  // Extract the headers
-            r_data.cgi_body = r_data.cgi_body.substr(pos + 4);
-            response << headers;    // Extract the body
+            r_data.cgi_body = r_data.cgi_body.substr(pos + 4);     // Extract the body
         }
-       //std::cerr << "Headers: " << headers << std::endl;
-       //std::cerr << "Body: " << r_data.cgi_body << std::endl;
+        response << headers;
+        //std::cerr << "Headers: " << headers << std::endl;
+        //std::cerr << "Body: " << r_data.cgi_body << std::endl;
         // exit(0);
         std::string str = response.str();
         length = r_data.getCgibody().size() + str.size();
@@ -253,9 +263,7 @@ int Response::check_status()
     else if(r_data.status_value == 501)
         error_generetor("501 Not Implemented");
     else if(r_data.status_value == 400)
-    {
         error_generetor("Bad Request");
-    }
     else if(r_data.status_value == 403)
         error_generetor("Forbidden");
     else if(r_data.status_value == 405)
@@ -268,10 +276,8 @@ int Response::check_status()
         error_generetor("Internal Server Error");
     else if(r_data.status_value == 409)
        error_generetor("409 Conflict");
-        else if(r_data.status_value == 414)
+     else if(r_data.status_value == 414)
        error_generetor("Request-URI Too Long");
-    else if(r_data.status_value == 413)
-       error_generetor("404 Not Found");
     else if(r_data.status_value == 1)
         respons_ai();
     else if(r_data.status_value == 204)
@@ -283,8 +289,11 @@ int Response::check_status()
 void Response::respons(int client_sock,std::vector<Config> &parsing)
 {
     (void)parsing;
-    len = 0;
-    c = 1;
+    if(c != -4 && remaining.size() == 0)
+    {
+        len = 0;
+        c = 1;
+    }
     if(check_status() == 1)
         c = -1;
     else if(r_data.getMethod() == "GET" && c != -4 && remaining.size() == 0)
@@ -299,6 +308,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        char buff[6000];
        if(remaining.size() > 0)
        {
+
             memcpy(buff,remaining.c_str(), len);
             remaining = "";
        }
@@ -309,7 +319,7 @@ void Response::respons(int client_sock,std::vector<Config> &parsing)
        i = send(client_sock, buff ,len, 0);
        if(i == -1)
        {
-            c = -1;
+            c = -4;
        }
        else
        {

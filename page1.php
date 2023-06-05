@@ -2,11 +2,11 @@
 <body>
 
 <?php
-if(!isset($_COOKIE[$cookie_name])) {
-  echo "Cookie named '" . $cookie_name . "' is not set!";
+if(!isset($_COOKIE['test_cookie'])) {
+  echo "Cookie named '" . $_COOKIE['test_cookie'] . "' is not set!";
 } else {
-  echo "Cookie '" . $cookie_name . "' is set!<br>";
-  echo "Value is: " . $_COOKIE[$cookie_name];
+  echo "Cookie '" . $_COOKIE['test_cookie'] . "' is set!<br>";
+  echo "Value is: " . $_COOKIE['test_cookie'];
 }
 ?>
 

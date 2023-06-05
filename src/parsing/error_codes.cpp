@@ -29,7 +29,6 @@ void Response::error_generetor(std::string str)
     std::stringstream response;
     std::string line;
     int i = 0;
-    
     bool check = false;
     if (!html_file.is_open())
     {
@@ -79,7 +78,7 @@ void Response::error_generetor(std::string str)
     }
     else
     {
-        if(remaining.size() == 0)
+        if(remaining.size() == 0 && c != -4)
         {
             html_file.read(response_buf2, 6000);
             len = html_file.gcount();

@@ -20,21 +20,21 @@ void Request::open_and_check(std::string appendedData)
     cgi_body = appendedData;
     if(status_value == 201)
     {  
-            std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
-            if(ite != header.end())
-            {
-        size_t start = ite->second.find("/") + 1;
-        size_t end = ite->second.find_first_of("\r\n");
-        std::string type = ite->second.substr(start, end - start);
-        std::string name = fullpath+ "3ar.";
-        name += type;
-        body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
-        if(!body.is_open())
+        std::map<std::string, std::string>::iterator ite = header.find("Content-Type");
+        if(ite != header.end())
         {
-            std::cerr << "Error: Could not open file" << std::endl;
-            exit(1);
-        }
-        body.write(appendedData.c_str(), appendedData.size());
+            size_t start = ite->second.find("/") + 1;
+            size_t end = ite->second.find_first_of("\r\n");
+            std::string type = ite->second.substr(start, end - start);
+            std::string name = fullpath+ "3ar.";
+            name += type;
+            body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
+            if(!body.is_open())
+            {
+                std::cerr << "Error: Could not open file" << std::endl;
+                exit(1);
+            }
+            body.write(appendedData.c_str(), appendedData.size());
         }
         else
             status_value = 400;

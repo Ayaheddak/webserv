@@ -42,7 +42,7 @@ void Request::handle_get(Config &config, Location location)
     if(location.getLocationPath() != "/")
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
-    // std::cout << targetPath <<std::endl;
+     std::cout << targetPath <<std::endl;
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (access(targetPath.c_str(), R_OK) != 0) {
             status_value = 403;
@@ -68,8 +68,14 @@ void Request::handle_get(Config &config, Location location)
                         status_value = 1;  
                         return;
                     }
-                    else
+                    else if(location.getAutoindex() == "off")
+                    {
                         status_value = 403;
+                    }
+                    else
+                    {
+                        status_value = 404;
+                    }
                 }
                 else
                 {
@@ -81,13 +87,20 @@ void Request::handle_get(Config &config, Location location)
             }
         } else {
             fullpath = targetPath;
-            status_value = (access(fullpath.c_str(), F_OK) != -1 && access(fullpath.c_str(), R_OK) != -1) ? 200 : 403;
+            if(!location.getCgiPath().empty())
+                        status_value = -1;
+            else if(access(fullpath.c_str(), R_OK) != -1)
+                status_value = 200;
+            else
+                status_value = 403;
         }
     } else {
          if(!location.getCgiPath().empty() && getPath().find("?") != std::string::npos)
             status_value = -1;
         else
+        {
             status_value = 404;
+        }
     }
 }
 
@@ -107,12 +120,16 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     if(it == locations.end())
     {
-        if(locations[0].getLocationPath() == "/")
+        for (it = locations.begin(); it != locations.end(); ++it) 
         {
-            it = locations.begin();
-             _location = *it;
+           Location location = *it;
+            if (location.getLocationPath() == "/")
+            {
+                _location = *it;
+                break;
+            }
         }
-        else
+        if(it == locations.end())
             status_value = 404;
     }
     if(!it->getRedirect().empty())
