@@ -1,6 +1,6 @@
 <?php
 // Set a cookie\
-while(1);
+// while(1);
 $cookie_name = "test_cookie";
 $cookie_value = "Hello, World!";
 $expiration = time() + (24 * 60 * 60); // Expiration time: 24 hours

@@ -31,8 +31,8 @@ void Request::open_and_check(std::string appendedData)
             body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
             if(!body.is_open())
             {
-                std::cerr << "Error: Could not open file" << std::endl;
-                exit(1);
+                status_value = 404;
+				return;
             }
             body.write(appendedData.c_str(), appendedData.size());
         }
