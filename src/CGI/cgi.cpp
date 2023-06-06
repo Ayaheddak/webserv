@@ -29,15 +29,12 @@ void Cgi::_initEnv(Request &request, Location &location, Config &config)
 	for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it)
 	{
 		std::string key = it->first;
-		std::cout << key << std::endl;
 		key.insert(0, "HTTP_");
 		for (std::string::size_type i = 0; i < key.length(); ++i)
 		{
 			key[i] = std::toupper(key[i]);
 		}
 		std::replace(key.begin(), key.end(), '-', '_');
-		// std::cout << "second" << it->second << std::endl;
-		// std::cout << "second sub" << it->second.substr(1) << std::endl;
 		if (it->second != "")
 		{
 		std::string value = it->second.substr(1);
@@ -47,7 +44,6 @@ void Cgi::_initEnv(Request &request, Location &location, Config &config)
 
 	std::string scriptName = location.getCgiExtension();
 	setenv("SCRIPT_NAME", scriptName.c_str(), true);
-	// std::cerr<<request.getPath().substr(request.getPath().find('?')+1).c_str() << "HANAAAAAAAAAAAAAAAA\n";
 	setenv("QUERY_STRING", request.getPath().substr(request.getPath().find('?') + 1).c_str(), true);
 	setenv("REQUEST_METHOD", request.getMethod().c_str(), true);
 	setenv("SCRIPT_FILENAME", (location.getCgiPath() + "/" + location.getCgiExtension()).c_str(), true);
@@ -75,13 +71,9 @@ std::string Cgi::executeCgi(const std::string &script)
 	long fdIn = fileno(fIn);
 	long fdOut = fileno(fOut);
 	int ret = 1;
-
 	write(fdIn, _body.c_str(), _body.size());
-	// std::cerr<< "ORIGINAL BODY============>> "<<_body << "\n";
 	lseek(fdIn, 0, SEEK_SET);
-	// std::cout << "test" << std::endl;
 	pid = fork();
-
 	if (pid == -1)
 	{
 		std::cerr << "Fork Faild." << std::endl;
@@ -99,8 +91,6 @@ std::string Cgi::executeCgi(const std::string &script)
 			str[0] = strdup("python-cgi");
 		str[1] = strdup(script.c_str());
 		str[2] = NULL;
-		// for(int i = 0; environ[i];i++)
-		//	std::cout << environ[i] << std::endl;
 		execve(str[0], str, environ);
 		std::cerr << "Execve Faild." << std::endl;
 		write(1, "500", 3);
@@ -140,14 +130,7 @@ std::string Cgi::executeCgi(const std::string &script)
 	close(fdOut);
 	close(saveStdin);
 	close(saveStdout);
-
-	// for (size_t i = 0; env[i]; i++)
-	// 	delete[] env[i];
-	// delete[] env;
-
 	if (!pid)
 		exit(0);
-
-	// std::cerr<< "new=body===========.>>>>>"<< newBody <<"\n";
 	return (newBody);
 }

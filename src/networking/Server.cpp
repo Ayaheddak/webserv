@@ -1,9 +1,6 @@
 #include "../../includes/Server.hpp"
 #include "../../includes/parsing.hpp"
 #include <limits>
-// Server::Server()
-// {}
-
 Server::Server(std::list<std::pair<std::string, std::string> > infoconfig, std::vector<Config> conf)
 {
 	for (std::list<std::pair<std::string, std::string> >::iterator it = infoconfig.begin(); it != infoconfig.end(); it++)
@@ -12,7 +9,7 @@ Server::Server(std::list<std::pair<std::string, std::string> > infoconfig, std::
 		_conf.push_back(*it);
 }
 
-int Server::createSocket(std::string port, std::string ip) // function to create a socket
+int Server::createSocket(std::string port, std::string ip)
 {
 	int option;
 	int serverFd;
@@ -113,13 +110,12 @@ void Server::start(std::vector<Config> &parsing)
 	}
 	while (true)
 	{
-		//std::cout << "+++++++ Waiting for new connection ++++++++ fd = " << maxFds << std::endl;
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
 		FD_ZERO(&readFds);
 		FD_ZERO(&writeFds);
 
-		readFds = backupRead; // cuz select is destructive
+		readFds = backupRead;
 		writeFds = backupWrite;
 		if (select(maxFds + 1, &readFds, &writeFds, NULL, &timeout) < 0)
 			throw SelectException();
@@ -150,7 +146,7 @@ void Server::start(std::vector<Config> &parsing)
 					FD_SET(clientSocket, &backupRead);
 					if (clientSocket > maxFds)
 						maxFds = clientSocket;
-					std::cout << "New connection "  << clientSocket << " from => " << getIpPort(i).first << " : " << getIpPort(i).second  << std::endl;
+					std::cout << "New connection : "  << clientSocket << " from => " << getIpPort(i).first << " : " << getIpPort(i).second  << std::endl;
 					Client c(clientSocket, getIpPort(i));
 					_clients.push_back(c);
 					break ;

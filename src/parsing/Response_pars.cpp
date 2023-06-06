@@ -23,7 +23,7 @@ std::string Request::handle_autoindex(const std::string& directoryPath) {
 
     while ((entry = readdir(dir)) != NULL) {
         std::string name = entry->d_name;
-        if (name == "." || name == "..") // kan ignori hadchi
+        if (name == "." || name == "..")
             continue;
 
         html += "<a href=\"" + name + "\">" + name + "</a>\n";
@@ -42,15 +42,13 @@ void Request::handle_get(Config &config, Location location)
     if(location.getLocationPath() != "/")
         size = location.getLocationPath().size();
     std::string targetPath = location.getRoot() + getPath().substr(size);
-     std::cout << targetPath <<std::endl;
     if (stat(targetPath.c_str(), &sb) == 0) {
         if (access(targetPath.c_str(), R_OK) != 0) {
             status_value = 403;
             return;
         }
         if (S_ISDIR(sb.st_mode)) 
-        {
-            // if (getPath()[getPath().size() - 1] != '/' &&getPath() != "") 
+        { 
             if (!getPath().empty() && getPath()[getPath().size() - 1] != '/')
             {
                 status_value = 301;
@@ -134,12 +132,9 @@ void Request::check_request(std::vector<Config>& parsing)
     }
     if(!it->getRedirect().empty())
     {
-         if(!it->getRedirect()[301].empty()) // orignal
-		//if (!it->getRedirect().at(301).empty()) // modified
+        if(!it->getRedirect()[301].empty())
         {
-            // std::cout << it->getRedirect()[301] << std::endl; // orignal
-             fullpath = it->getRedirect()[301];	// orignal
-			//fullpath = it->getRedirect().at(301); // modified
+            fullpath = it->getRedirect()[301];
             status_value = 301;
             return;
         } 
@@ -168,7 +163,6 @@ void Request::check_request(std::vector<Config>& parsing)
     {
         handle_delete(_host,*it);
     }
-    // std::cout << status_value << std::endl;
 }
 
 int delete_file(const char* fpath, const struct stat* sb, int typeflag, struct FTW* ftwbuf)
@@ -277,8 +271,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
                     if(location.getCgiPath().empty())
                         status_value = 403;
                     else
-                         status_value = -1; // hna fin dir cgi blast had status
-                            // Cgi.executeCgi(location.getCgiExtension());
+                        status_value = -1;
                 }
             }
         } else {
@@ -286,8 +279,7 @@ void Request::handle_post(Config &config,Location location) // need request hna
              if(location.getCgiPath().empty())
                 status_value = 403;
             else
-                 status_value = -1; // hna fin dir cgi blast had status
-                //   Cgi.executeCgi(location.getCgiExtension()) had cgi ececute script makaynch 7awl mnin dbr 3Lih mohim lbody li kayn fgetbody;
+                 status_value = -1;
         }
     } else {
         status_value = 404;

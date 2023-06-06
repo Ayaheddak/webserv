@@ -10,7 +10,7 @@ std::string trim_leading_chars(const std::string& input, const std::string& char
     if (pos != std::string::npos)
         return input.substr(pos);
     else
-        return ""; // all characters were trimmed, return an empty string
+        return ""; 
 }
 std::string get_f_type(std::string str)
 {
@@ -201,9 +201,7 @@ void Response::cgi_response()
 
     if(status == false)
     {
-        std::cout<<r_data._location.getCgiExtension()<<" here"<<std::endl;
         Cgi cgi(r_data,r_data._host,r_data._location);
-        //std::cout<< "QBL++++++++++++++++++>>>> "<<r_data.cgi_body <<'\n';
         r_data.cgi_body = cgi.executeCgi(r_data._location.getCgiPath()+ "/"+ r_data._location.getCgiExtension());
         if(r_data.cgi_body == "500")
         {
@@ -229,19 +227,15 @@ void Response::cgi_response()
         size_t pos = r_data.cgi_body.find("\r\n\r\n");
         if (pos != std::string::npos)
         {
-            headers = r_data.cgi_body.substr(0, pos + 4);  // Extract the headers
-            r_data.cgi_body = r_data.cgi_body.substr(pos + 4);     // Extract the body
+            headers = r_data.cgi_body.substr(0, pos + 4); 
+            r_data.cgi_body = r_data.cgi_body.substr(pos + 4);  
         }
         response << headers;
-        //std::cerr << "Headers: " << headers << std::endl;
-        //std::cerr << "Body: " << r_data.cgi_body << std::endl;
-        // exit(0);
         std::string str = response.str();
         length = r_data.getCgibody().size() + str.size();
         str.copy(response_buf2,str.length());
         response_buf2[str.length()] = '\0';
         len = strlen(response_buf2);
-        // std::cout << response_buf2<<std::endl;
         status = true;
     }
     else

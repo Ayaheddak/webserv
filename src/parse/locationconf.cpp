@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:46:25 by aheddak           #+#    #+#             */
-/*   Updated: 2023/05/27 23:32:46 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/06/06 02:41:13 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,8 +158,6 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 		}
 		if ((l1.empty() && l1 == "" )|| (tmp != "root" && tmp != "cgi_path" && tmp != "cgi_name" && tmp != "autoindex" && tmp != "index" && tmp != "allow_methods" && tmp != "upload" && tmp != "location" && tmp != "redirect"))
 		{
-			std::cout << "l1 " << l1 << std::endl;
-			std::cout << "tmp " << tmp << std::endl;
 			std::cerr <<  "Error : location block   2 " << std::endl;
 			exit (0);
 		}
@@ -217,7 +215,6 @@ void Location::readLocation(std::ifstream	&file,std::string value, std::string c
 				std::cerr << "Error: cgi extension not valid" << std::endl;
 				exit(0);
 			}
-			std::cout << l1<< ","<< _locationPath <<std::endl;
 			_cgiExtension = l1;
 		}
 		iss >>cheeck;

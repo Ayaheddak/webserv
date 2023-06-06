@@ -31,6 +31,7 @@ void Request::open_and_check(std::string appendedData)
             body.open(name.c_str(), std::ios::in | std::ios::out | std::ios::trunc |std::ios::binary); 
             if(!body.is_open())
             {
+				std::cout << "Error open file" << std::endl;
                 status_value = 404;
 				return;
             }
@@ -255,14 +256,9 @@ void Request::clear()
 }
 Config Request::getServer(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)const
 {
-	// std::cout << "searching server" << std::endl;
-	// std::cout << "host: " << infoconfig.first << std::endl;
-	// std::cout << "listen: " << infoconfig.second << std::endl;
 	std::vector<Config>::iterator it;
 	for (it = conf.begin(); it != conf.end(); it++)
 	{
-		// std::cout << "host: " << it->getHost() << std::endl;
-		// std::cout << "listen: " << it->getListen() << std::endl;
 		if (it->getHost() == infoconfig.first && it->getListen() == infoconfig.second)
 		{
 			std::cout << "server found" << std::endl;
@@ -270,32 +266,11 @@ Config Request::getServer(std::vector<Config> conf, std::pair<std::string, std::
 		}
 	}
 	return *it;
-	// std::cout << "server not found" << std::endl;
-	// exit(1);
 }
-
-// std::string removeWhitespace(const std::string& str)
-// {
-//     std::string result = str;
-//     std::string::size_type pos = result.find_first_not_of(" \t\r\n");
-//     if (pos != std::string::npos)
-//         result.erase(0, pos);
-    
-//     pos = result.find_last_not_of(" \t\r\n");
-//     if (pos != std::string::npos)
-//         result.erase(pos + 1);
-    
-//     return result;
-// }
 
 void Request::matching(std::vector<Config> conf, std::pair<std::string, std::string> infoconfig)
 {
 	std::string search = header["Host"];
-	// std::cout << "value of Host header--->" << header["Host"] << std::endl;
-	// std::cout << "value of search:" << value << std::endl;
-	// size_t f = search.find(":");
-	// if (f != std::string::npos)
-	// 	search = search.substr(0, f);
 	std::vector<Config>::iterator s = findMatchingConfig(conf, search, infoconfig);
 	if (s == conf.end())
 		s = findMatchingConfigWithoutName(conf, infoconfig);
@@ -305,7 +280,6 @@ void Request::matching(std::vector<Config> conf, std::pair<std::string, std::str
 	{
 		std::cout << "no matching server" << std::endl;
 		_host = getServer(conf,infoconfig);
-		// exit(1);
 	}
    
 }
@@ -326,15 +300,6 @@ std::vector<Config>::iterator Request::findMatchingConfig(std::vector<Config>& c
 	std::string value;
 	for (s = conf.begin(); s != conf.end(); s++)
 	{
-		// std::cout << "infoconfig second: " << infoconfig.second << std::endl;//127.0.0.1
-		// std::cout << "listen: " << s->getListen() << std::endl;
-		// std::cout << std::endl;
-		// std::cout << "infoconfig first: " << infoconfig.first << std::endl;//8005
-		// std::cout << "host: " << s->getHost() << std::endl;
-		// std::cout << std::endl;
-		// std::cout << "server name: " << s->getServerName() << std::endl;
-		// std::cout << "search: " << search << std::endl;
-		// std::cout << std::endl;
 		value = removeCarriageReturn(search);
 		value = removeLeadingWhitespace(value);
 		std::cout << "value:" << value << std::endl;

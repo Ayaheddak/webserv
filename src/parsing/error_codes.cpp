@@ -6,7 +6,7 @@
 /*   By: aheddak <aheddak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 05:00:59 by aainhaja          #+#    #+#             */
-/*   Updated: 2023/05/27 23:24:54 by aheddak          ###   ########.fr       */
+/*   Updated: 2023/06/06 02:18:34 by aheddak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,9 @@ void Response::error_generetor(std::string str)
     if (!html_file.is_open())
     {
         glen = 0;
-        if (!r_data._host.getErrorPage().empty() && !r_data._host.getErrorPage()[r_data.status_value].empty()) // original
-		//if (!r_data._host.getErrorPage().at(r_data.status_value).empty()) // modifier here
+        if (!r_data._host.getErrorPage().empty() && !r_data._host.getErrorPage()[r_data.status_value].empty())
         {
-           
-            std::string index = r_data._host.getErrorPage()[r_data.status_value]; // original
-			//std::string index = r_data._host.getErrorPage().at(r_data.status_value); // modifier here
+            std::string index = r_data._host.getErrorPage()[r_data.status_value];
             if (index[i] == '.')
             {
                 while (index[i] == '.' || index[i] == '/')
